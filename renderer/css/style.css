@@ -1,0 +1,1333 @@
+:root {
+  /* ===== Thème clair (theme.txt) ===== */
+  --ink: #2C3E50;
+  --ink-2: #36454F;
+  --paper: #F4F5F7;
+  --paper-2: #FFFFFF;
+  --line: #E3E6E9;
+  --accent: #2FA4B0;
+  --accent-2: #4DBAC5;
+  --text: #2C3E50;
+  --text-muted: #6B7A82;
+  --text-strong: #26343F;
+  --success: #2F7D5C;
+  --success-bg: #E5F3EC;
+  --danger: #B23A3A;
+  --danger-bg: #FBEAEA;
+  --warn: #B2792F;
+  --warn-bg: #FBF1E1;
+  --info: #33538F;
+  --info-bg: #EAF0FB;
+  --hover-bg: #EDEFF2;
+  --indigo: #2FA4B0;
+  --indigo-bg: #E3F3F4;
+  --radius: 1px;
+  --shadow: 0 1px 2px rgba(54,69,79,0.05), 0 6px 18px rgba(54,69,79,0.06);
+  --shadow-sm: 0 1px 2px rgba(54,69,79,0.06);
+  --overlay: rgba(44,62,80,0.45);
+  --scrollbar-thumb: var(--line);
+  --scrollbar-thumb-hover: #C4CBCF;
+  color-scheme: light;
+}
+
+/* Thème sombre (theme.txt) : mêmes variables, valeurs adaptées. Le bandeau
+   supérieur et le panneau d'illustration de connexion restent volontairement
+   sombres dans les deux thèmes (identité visuelle fixe) ; ce sont les
+   surfaces de contenu (fond de page, cartes, champs, tableaux) qui
+   basculent. */
+:root[data-theme="dark"] {
+  --paper: #121212;
+  --paper-2: #1E1E1E;
+  --line: #303030;
+  --text: #E0E0E0;
+  --text-muted: #A0A0A0;
+  --text-strong: #F2F2F2;
+  --success: #4CAF7D;
+  --success-bg: rgba(76,175,125,0.16);
+  --danger: #E2726B;
+  --danger-bg: rgba(226,114,107,0.16);
+  --warn: #E0A857;
+  --warn-bg: rgba(224,168,87,0.16);
+  --info: #7FA6E0;
+  --info-bg: rgba(127,166,224,0.16);
+  --hover-bg: rgba(255,255,255,0.05);
+  --indigo: #4ECDC4;
+  --indigo-bg: rgba(78,205,196,0.16);
+  --accent: #4ECDC4;
+  --accent-2: #6FDAD3;
+  --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 4px 16px rgba(0,0,0,0.4);
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+  --overlay: rgba(4,7,12,0.62);
+  --scrollbar-thumb: #333B4A;
+  --scrollbar-thumb-hover: #454F62;
+  color-scheme: dark;
+}
+
+/* Style strict imposé au rendu : aspect rectangulaire, pro et épuré partout
+   (boutons, cartes, champs, modales…), quel que soit le --radius défini
+   ponctuellement par un composant. */
+* { border-radius: 1px !important; }
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: -apple-system, "Segoe UI", "Inter", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--text);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+button { font-family: inherit; }
+input, select, textarea { font-family: inherit; }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Bascule de thème en douceur : seules les surfaces de contenu transitionnent
+   (le bandeau latéral et le panneau de connexion restent volontairement
+   fixes, voir plus bas — pas besoin d'y transitionner). */
+body, .card, .modal, .modal-overlay, .field input, .field select, .field textarea,
+.btn, table, thead th, tbody td, .toast, .stamp, .status-pill, .chart-select,
+.login-error, .auth-form-panel {
+  transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+/* Barre de défilement adaptée au thème (Firefox + navigateurs Chromium) */
+* { scrollbar-color: var(--scrollbar-thumb) transparent; scrollbar-width: thin; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 6px; border: 2px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); background-clip: padding-box; }
+
+/* ===================== AUTHENTIFICATION (illustration + connexion) ===================== */
+#auth-screen {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+}
+.auth-panel { flex: 1 1 50%; display: flex; align-items: center; justify-content: center; min-width: 0; }
+
+.auth-presentation {
+  background:
+    radial-gradient(circle at 15% 15%, rgba(47,182,196,0.16), transparent 42%),
+    radial-gradient(circle at 85% 85%, rgba(217,142,43,0.12), transparent 45%),
+    var(--ink);
+  color: #E9ECF2;
+  padding: 40px;
+}
+.auth-presentation-inner { max-width: 420px; }
+.auth-presentation .welcome-mark { margin: 0 0 16px; }
+.auth-title { font-size: 24px; margin: 0 0 4px; letter-spacing: 0.2px; color: #be8d21; }
+.auth-presentation .welcome-tagline { margin-bottom: 22px; color: #9FB0C4; }
+.auth-illustration { width: 100%; max-width: 340px; height: auto; display: block; margin-bottom: 22px; filter: drop-shadow(0 12px 30px rgba(0,0,0,0.35)); }
+.auth-presentation .welcome-text { color: #C3CCDA; margin-bottom: 0; }
+.auth-presentation .login-hint { color: #7C8AA0; }
+
+.auth-form-panel {
+  background: var(--paper-2);
+}
+.login-card {
+  width: 380px;
+  max-width: 86%;
+  background: var(--paper-2);
+  border-radius: 5px;
+  padding: 40px 36px;
+}
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+.login-mark {
+  width: 42px; height: 42px;
+  border-radius: 5px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; color: white; font-size: 18px;
+  transform: rotate(-3deg);
+}
+.login-brand h1 { font-size: 17px; margin: 0; letter-spacing: 0.2px; }
+.login-brand span { display: block; font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+/* CORRECTIF (audit) : quand un logo d'entreprise est enregistré et affiché
+   (voir #auth-logo-img dans index.html/auth.js), le badge "OLI" (dégradé +
+   rotation) doit s'effacer au profit d'une vraie image, sans fond ni forme
+   imposée — le logo garde ses propres couleurs. */
+#auth-logo-wrap:has(#auth-logo-img:not(.hidden)) {
+  background: none;
+  transform: none;
+  width: auto;
+  height: auto;
+}
+#auth-logo-img { max-width: 120px; max-height: 64px; object-fit: contain; display: block; }
+
+/* CORRECTIF (demande client) : même principe que #auth-logo-wrap ci-dessus,
+   appliqué au badge "OLI" de la barre supérieure (voir
+   renderer/js/modules/branding.js#appliquerBrandingApp) — le badge dégradé
+   s'efface au profit du vrai logo dès qu'un logo d'entreprise est
+   enregistré. */
+#brand-mark:has(#brand-logo-img:not(.hidden)) {
+  background: none;
+  transform: none;
+}
+#brand-logo-img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+
+.field { margin-bottom: 16px; }
+.field label { display: block; font-size: 12.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.04em; }
+.field input, .field select, .field textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  font-size: 14px;
+  background: var(--paper-2);
+  color: var(--text);
+}
+.field textarea { resize: vertical; min-height: 60px; }
+.field input:hover, .field select:hover, .field textarea:hover { border-color: #C7CCD8; }
+:root[data-theme="dark"] .field input:hover,
+:root[data-theme="dark"] .field select:hover,
+:root[data-theme="dark"] .field textarea:hover { border-color: #3C4457; }
+.field input:focus, .field select:focus, .field textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(217,142,43,0.18);
+}
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 10px 18px;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  font-size: 14px; font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.12s ease, transform 0.05s ease;
+}
+.btn:active { transform: translateY(1px); }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { filter: brightness(1.06); }
+.btn-dark { background: var(--ink); color: #fff; }
+.btn-ghost { background: transparent; color: var(--text); border-color: var(--line); }
+.btn-ghost:hover { background: var(--hover-bg); }
+.client-mode-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn-danger { background: var(--danger-bg); color: var(--danger); border-color: transparent; }
+.btn-danger:hover { filter: brightness(0.97); }
+.btn-block { width: 100%; }
+.btn-sm { padding: 6px 10px; font-size: 12.5px; }
+
+.login-error {
+  background: var(--danger-bg); color: var(--danger);
+  padding: 10px 12px; border-radius: 5px; font-size: 13px; margin-bottom: 14px;
+  display: none;
+}
+.login-hint { margin-top: 18px; font-size: 12px; color: var(--text-muted); text-align: center; }
+
+/* ===================== APP SHELL ===================== */
+#app-shell { display: none; height: 100vh; flex-direction: column; }
+#app-shell.active { display: flex; }
+
+/* ===================== CONFIGURATION INITIALE (premier lancement) =====================
+   Même structure que #auth-screen (voir plus haut) : masqué par défaut,
+   affiché à la place de l'écran de connexion tant qu'aucun utilisateur
+   n'existe en base (voir renderer/js/app.js#init et modules/setup.js). */
+#setup-screen { display: none; height: 100vh; width: 100vw; }
+#setup-screen.active { display: flex; }
+#setup-logo-mark { width: 42px; height: 42px; flex: 0 0 auto; }
+#setup-logo-mark:has(#setup-logo-preview:not(.hidden)) { background: none; transform: none; width: auto; height: auto; }
+#setup-logo-preview { max-width: 80px; max-height: 48px; object-fit: contain; display: block; }
+
+/* ===================== BARRE SUPERIEURE STRUCTUREE =====================
+   Regroupe la marque, la navigation par catégories (avec menus déroulants
+   au survol), la recherche globale et le bloc utilisateur dans une seule
+   barre horizontale sombre, fixe en haut de l'application. */
+.app-topbar {
+  flex-shrink: 0;
+  background: linear-gradient(180deg, var(--ink-2) 0%, var(--ink) 100%);
+  color: #EAF0F4;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.05) inset, 0 6px 18px rgba(0,0,0,0.18);
+  position: relative; z-index: 40;
+}
+.app-topbar-row { display: flex; align-items: center; gap: 22px; padding: 0 20px; height: 60px; }
+
+.brand { display: flex; align-items: center; gap: 10px; flex: 0 0 auto; }
+.brand-mark { width: 32px; height: 32px; font-size: 14px; }
+.brand-text { line-height: 1.15; }
+.brand-text .name { font-weight: 700; font-size: 14px; letter-spacing: 0.01em; }
+.brand-text .ver { font-size: 10.5px; color: #9FB0C4; font-weight: 500; letter-spacing: 0.03em; }
+
+.topnav { display: flex; align-items: stretch; gap: 2px; flex: 1 1 auto; height: 60px; min-width: 0; }
+.topnav-item { position: relative; display: flex; align-items: center; }
+.topnav-link {
+  display: flex; align-items: center; gap: 6px; height: 100%; padding: 0 13px;
+  font-size: 13.5px; font-weight: 600; color: #B9C7D6;
+  border-bottom: 2px solid transparent; text-decoration: none;
+  white-space: nowrap; cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+.topnav-link:hover { color: #fff; background: rgba(255,255,255,0.045); }
+.topnav-item.active .topnav-link { color: #fff; border-bottom-color: var(--accent); }
+.topnav-link .caret { font-size: 10px; opacity: 0.7; transition: transform 0.15s ease; }
+.topnav-item:hover .caret { transform: rotate(180deg); }
+
+.dropdown {
+  position: absolute; top: 100%; left: 0; min-width: 230px;
+  background: var(--paper-2); border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  padding: 6px;
+  opacity: 0; visibility: hidden; transform: translateY(4px);
+  transition: opacity 0.14s ease, transform 0.14s ease, visibility 0.14s;
+  z-index: 50;
+}
+.user-dropdown { left: auto; right: 0; min-width: 190px; }
+.topnav-item:hover .dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
+.dropdown a, .dropdown button {
+  display: flex; align-items: center; gap: 9px; width: 100%; text-align: left;
+  padding: 8px 10px; font-size: 13px; font-weight: 500;
+  color: var(--text); text-decoration: none; background: none; border: none; cursor: pointer;
+}
+.dropdown a:hover, .dropdown button:hover { background: var(--indigo-bg); color: var(--indigo); }
+.dropdown .nav-icon { width: 16px; text-align: center; font-size: 13px; color: var(--text-muted); flex-shrink: 0; }
+.dropdown a:hover .nav-icon { color: var(--indigo); }
+.dropdown-item.active { color: var(--indigo); font-weight: 600; }
+
+.topbar-right { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
+
+.icon-btn {
+  position: relative; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+  background: transparent; border: none; color: #C9D3E0; font-size: 15px; cursor: pointer;
+}
+.icon-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+
+.user-chip { display: flex; align-items: center; gap: 8px; padding: 4px 8px 4px 5px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); cursor: pointer; }
+.avatar { width: 26px; height: 26px; flex-shrink: 0; background: linear-gradient(135deg, var(--accent-2), var(--accent)); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #10262A; }
+.user-meta { line-height: 1.15; }
+.user-meta .u-name { font-size: 12px; font-weight: 600; color: #EAF0F4; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.user-meta .u-role { font-size: 10.5px; color: #9FB0C4; text-transform: capitalize; }
+
+.main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 26px 32px 60px;
+  background: var(--paper);
+}
+
+/* En-tête de page (à l'intérieur de chaque module) : titre + actions */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 22px;
+}
+.topbar h2 { font-size: 21px; margin: 0; }
+.topbar .sub { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+@media (max-width: 1180px) {
+  .app-topbar-row { flex-wrap: wrap; height: auto; padding: 10px 16px; gap: 10px; }
+  .topnav, .topbar-right { height: auto; }
+  .global-search-wrap { flex: 1 1 100%; order: 3; max-width: none; }
+}
+
+.grid { display: grid; gap: 16px; }
+.grid-1 { grid-template-columns: repeat(1, 1fr); }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+
+.card {
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 18px 20px;
+  box-shadow: var(--shadow);
+}
+
+.kpi-label { font-size: 11.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; }
+.kpi-value { font-size: 19px; font-weight: 700; margin-top: 6px; color: var(--text-strong); }
+.kpi-accent { color: var(--accent); }
+
+/* AMÉLIORATION (audit, v2) : les indicateurs du dashboard (de "CA du jour"
+   à "Prestations") tiennent maintenant en 2 lignes seulement — la 1ère avec
+   les 2 chiffres qu'on regarde en premier (CA du jour/mois) en grand format,
+   la 2e avec tout le reste réuni dans une seule bande qui se répartit sur
+   la largeur disponible (auto-fit) : selon la largeur d'écran ça occupe
+   visuellement 1 à 2 lignes plutôt que la dizaine de cartes empilées
+   auparavant. Voir dashboard.js. */
+/* CORRECTIF (demande client) : les 4 cartes (CA jour, CA mois, Trésorerie,
+   Bénéfice estimé) étaient nettement plus grandes (30px) que le reste des
+   indicateurs de l'application (19px pour .kpi-value, 15.5px pour
+   .kpi-flow-item), ce qui rompait la cohérence visuelle du tableau de bord.
+   Taille réduite pour rester lisible en un coup d'œil sans écraser le reste
+   de la page. */
+.kpi-hero { padding: 16px 18px; }
+.kpi-hero .kpi-label { font-size: 11.5px; }
+.kpi-hero .kpi-value { font-size: 22px; margin-top: 6px; }
+.kpi-flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); padding: 0; }
+.kpi-flow-item { padding: 12px 16px; border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); }
+.kpi-flow-item .kpi-label { font-size: 10px; }
+.kpi-flow-item .kpi-value { font-size: 15.5px; margin-top: 3px; }
+.kpi-flow-item .kpi-sub, .kpi-flow-item .kpi-trend { font-size: 9.5px; margin-top: 2px; }
+.kpi-value-accent { color: var(--accent); }
+.kpi-value-success { color: var(--success); }
+
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+thead th {
+  text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--text-muted); padding: 8px 10px; border-bottom: 1px solid var(--line);
+}
+tbody td { padding: 10px 10px; border-bottom: 1px solid var(--line); }
+tbody tr:hover { background: var(--hover-bg); }
+tbody tr:last-child td { border-bottom: none; }
+
+.toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 10px; flex-wrap: wrap; }
+.toolbar-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.search-input { min-width: 220px; }
+
+.stamp {
+  display: inline-block;
+  font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+  padding: 3px 9px; border-radius: 5px;
+}
+.stamp-payee { background: var(--success-bg); color: var(--success); }
+.stamp-attente { background: var(--warn-bg); color: var(--warn); }
+.alert { padding: 10px 14px; border-radius: 8px; font-size: 13px; }
+.alert-warning { background: var(--warn-bg); color: var(--warn); border: 1px solid var(--warn); }
+.alert-success { background: var(--success-bg); color: var(--success); border: 1px solid var(--success); }
+.stamp-partiel { background: var(--info-bg); color: var(--info); }
+.stamp-annulee { background: var(--danger-bg); color: var(--danger); }
+
+.modal-overlay {
+  position: fixed; inset: 0; background: var(--overlay);
+  display: none; align-items: center; justify-content: center; z-index: 50;
+  animation: fadeIn 0.15s ease;
+}
+.modal-overlay.active { display: flex; }
+.modal-overlay-2 { z-index: 80; }
+.modal-overlay-2 .modal { width: 460px; transform: translateY(6px); }
+.modal {
+  background: var(--paper-2); border-radius: 5px; width: 520px; max-width: 92vw;
+  max-height: 88vh; overflow-y: auto;
+  box-shadow: 0 24px 70px rgba(0,0,0,0.4);
+  animation: modalIn 0.16s ease;
+}
+/* Formulaires à contenu large (vente / pro-forma : lignes d'articles avec
+   plusieurs colonnes) — on élargit la fenêtre plutôt que d'écraser les
+   champs. Reste toujours limité à la largeur de l'écran (max-width). */
+#modal-overlay .modal.modal-wide { width: 900px; max-width: 96vw; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes modalIn { from { opacity: 0; transform: translateY(8px) scale(0.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.modal-header { padding: 18px 22px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; }
+.modal-header h3 { margin: 0; font-size: 16px; }
+.modal-close { cursor: pointer; color: var(--text-muted); font-size: 18px; background: none; border: none; }
+.modal-body { padding: 20px 22px; }
+.modal-footer { padding: 14px 22px 20px; display: flex; justify-content: flex-end; gap: 8px; }
+
+.empty-state { text-align: center; padding: 50px 20px; color: var(--text-muted); }
+.empty-state .big { font-size: 30px; margin-bottom: 10px; }
+
+.toast-wrap { position: fixed; bottom: 22px; right: 22px; display: flex; flex-direction: column; gap: 8px; z-index: 100; }
+.toast { padding: 12px 16px; border-radius: 5px; font-size: 13.5px; box-shadow: 0 8px 24px rgba(0,0,0,0.22); color: #fff; min-width: 220px; animation: slideIn 0.18s ease; }
+.toast.success { background: var(--success); }
+.toast.error { background: var(--danger); }
+.toast.info { background: var(--ink); }
+@keyframes slideIn { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.badge-role { padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; background: var(--info-bg); color: var(--info); text-transform: capitalize; }
+
+/* Indicateur visuel (pastille) affiché quand des filtres sont actifs sur une
+   page de liste (ex. Ventes, Services) — permet de repérer d'un coup d'œil
+   qu'une liste affichée est filtrée, sans avoir à relire chaque champ. */
+.badge-filtre-actif { display: inline-block; margin-left: 4px; color: var(--danger, #d9534f); font-size: 10px; line-height: 1; vertical-align: middle; }
+
+/* Liste des lignes ignorées lors d'un import CSV (récapitulatif) */
+.import-recap-list { max-height: 220px; overflow-y: auto; margin: 0; padding-left: 18px; font-size: 12.5px; }
+.import-recap-list li { margin-bottom: 4px; }
+.import-recap-doublons li { color: var(--warning, #b8860b); }
+.import-recap-erreurs li { color: var(--danger, #d9534f); }
+.muted { color: var(--text-muted); }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* ===================== Formulaires de vente / pro-forma (sections numérotées, cf. maquettes) ===================== */
+.form-section { margin-bottom: 18px; }
+.form-section-title {
+  display: flex; align-items: center; gap: 9px;
+  font-size: 12.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--text-strong); margin-bottom: 10px;
+}
+.form-section-title .section-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px; border-radius: 7px; flex: none;
+  background: var(--warn-bg); color: var(--accent);
+}
+.form-section-title .section-icon svg { width: 13px; height: 13px; }
+.form-section-hint { font-size: 11.5px; color: var(--text-muted); font-weight: 500; text-transform: none; letter-spacing: 0; margin-left: 4px; }
+.form-section-box { border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; background: var(--paper-2); }
+
+.client-mode-tabs.client-mode-tabs-even { display: grid; grid-template-columns: repeat(3, 1fr); }
+.client-mode-tabs-even .client-mode-btn { justify-content: center; }
+
+/* Lignes d'articles : colonnes à largeur FIXE (et non "fr"/pourcentage) pour
+   qu'aucun champ ne soit jamais écrasé quand la fenêtre est étroite — le
+   tableau garde sa largeur naturelle et défile horizontalement à la place
+   (voir .lignes-scroll juste en dessous). */
+.lignes-scroll { overflow-x: auto; overflow-y: hidden; padding-bottom: 6px; margin: 0 -2px; }
+.lignes-header, .line-item {
+  display: grid;
+  grid-template-columns: 26px 270px 108px 118px 92px 118px 40px;
+  gap: 10px; width: max-content; min-width: 100%;
+}
+.lignes-header {
+  align-items: center;
+  padding: 0 4px 8px; font-size: 11px; text-transform: uppercase;
+  letter-spacing: 0.04em; color: var(--text-muted); font-weight: 600;
+  border-bottom: 1px solid var(--line); margin-bottom: 10px;
+}
+.line-item {
+  align-items: start; padding: 8px 4px; margin-bottom: 8px;
+  border-radius: var(--radius); transition: background 0.12s ease;
+}
+.line-item:hover { background: var(--hover-bg); }
+
+.line-item select, .line-item input, .article-cell input {
+  padding: 8px 10px; font-size: 13px; border: 1px solid var(--line); border-radius: var(--radius);
+  background: var(--paper); color: var(--text); width: 100%; transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+.line-item input:hover, .article-cell input:hover { border-color: #C7CCD8; }
+:root[data-theme="dark"] .line-item input:hover,
+:root[data-theme="dark"] .article-cell input:hover { border-color: #3C4457; }
+.line-item input:focus, .article-cell input:focus {
+  outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(217,142,43,0.18);
+}
+.line-item input:disabled { background: var(--hover-bg); cursor: default; }
+.line-num {
+  display: flex; align-items: center; justify-content: center; color: var(--text-muted);
+  font-size: 11.5px; font-weight: 700; background: var(--hover-bg); border-radius: 50%;
+  width: 20px; height: 20px; margin-top: 7px;
+}
+
+/* Cellule "Article" : champ de recherche (+ bouton "+") empilé au-dessus du
+   champ "Détails" — les deux s'étirent à la largeur de cette cellule (voir
+   align-items:stretch par défaut d'un flex en column), donc "Détails" fait
+   TOUJOURS exactement la même largeur que le champ de recherche au-dessus. */
+.article-cell { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.article-search-row { display: flex; align-items: stretch; gap: 6px; min-width: 0; flex-wrap: nowrap; }
+.article-search-row .combobox-wrapper { flex: 1; min-width: 0; }
+.article-cell .l-details { font-size: 12.5px; color: var(--text-muted); }
+
+/* Bouton "+" compact, collé au champ de recherche — remplace l'ancien texte
+   "➕ Nouveau" qui pouvait passer à la ligne et donnait l'impression que
+   l'ajout d'un nouveau produit/service n'était pas vraiment possible. */
+.btn-add-inline {
+  flex: none; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+  border: 1px dashed var(--line); border-radius: var(--radius); background: transparent;
+  color: var(--accent); font-size: 19px; font-weight: 700; line-height: 1; cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+.btn-add-inline:hover { background: var(--warn-bg); border-color: var(--accent); border-style: solid; }
+
+.qte-stepper { display: flex; align-items: stretch; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--paper); width: 100%; }
+.qte-stepper input.l-qte {
+  border: none !important; text-align: center; width: 100%; min-width: 0; padding: 7px 2px !important;
+  -moz-appearance: textfield; background: transparent; border-radius: 0 !important; box-shadow: none !important;
+}
+.qte-stepper input.l-qte::-webkit-outer-spin-button,
+.qte-stepper input.l-qte::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.qte-stepper:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(217,142,43,0.18); }
+.qte-btn { border: none; background: var(--hover-bg); color: var(--text); width: 26px; cursor: pointer; font-size: 15px; line-height: 1; flex: none; }
+.qte-btn:hover { background: var(--line); }
+
+/* Formulaire "Nouvel achat" : grille dédiée (5 colonnes, pas de champ "détails"
+   ni de remise) — volontairement distincte de .line-item (vente/pro-forma,
+   7 colonnes) pour ne jamais désaligner l'un ou l'autre formulaire si leur
+   nombre de colonnes venait à changer indépendamment. */
+.achat-lignes-header, .achat-line-item {
+  display: grid;
+  grid-template-columns: 26px 1fr 108px 118px 118px 40px;
+  gap: 10px; width: max-content; min-width: 100%;
+}
+.achat-lignes-header {
+  align-items: center;
+  padding: 0 4px 8px; font-size: 11px; text-transform: uppercase;
+  letter-spacing: 0.04em; color: var(--text-muted); font-weight: 600;
+  border-bottom: 1px solid var(--line); margin-bottom: 10px;
+}
+.achat-line-item {
+  align-items: center; padding: 8px 4px; margin-bottom: 8px;
+  border-radius: var(--radius); transition: background 0.12s ease;
+}
+.achat-line-item:hover { background: var(--hover-bg); }
+.achat-line-item .article-search-row { display: flex; min-width: 260px; }
+.achat-line-item .article-search-row .combobox-wrapper { flex: 1; }
+.achat-line-item input {
+  padding: 8px 10px; font-size: 13px; border: 1px solid var(--line); border-radius: var(--radius);
+  background: var(--paper); color: var(--text); width: 100%; transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+.achat-line-item input:hover { border-color: #C7CCD8; }
+:root[data-theme="dark"] .achat-line-item input:hover { border-color: #3C4457; }
+.achat-line-item input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(217,142,43,0.18); }
+
+.line-item-delete { background: var(--danger-bg); color: var(--danger); border-color: transparent; padding: 8px; height: 34px; width: 34px; display: flex; align-items: center; justify-content: center; }
+.line-item-delete:hover { filter: brightness(0.96); }
+.line-item-delete svg { width: 14px; height: 14px; display: block; }
+
+/* AJOUT (audit) : liste des cibles (produit(s)/service(s) concernés) d'une
+   nomenclature, module Nomenclatures. Grille propre à 3 colonnes (type,
+   combobox, suppression) — distincte de .achat-line-item (6 colonnes,
+   dédiée aux lignes de matières premières) pour ne pas désaligner l'une ou
+   l'autre liste si leur nombre de colonnes venait à changer indépendamment. */
+.cible-lignes-header, .achat-line-item.cible-line-item {
+  display: grid; grid-template-columns: 150px 1fr 40px; gap: 10px; width: max-content; min-width: 100%;
+}
+.cible-lignes-header {
+  align-items: center; padding: 0 4px 8px; font-size: 11px; text-transform: uppercase;
+  letter-spacing: 0.04em; color: var(--text-muted); font-weight: 600;
+  border-bottom: 1px solid var(--line); margin-bottom: 10px;
+}
+.achat-line-item.cible-line-item .c-type {
+  padding: 8px 10px; font-size: 13px; border: 1px solid var(--line); border-radius: var(--radius);
+  background: var(--paper); color: var(--text);
+}
+.achat-line-item.cible-line-item .cible-combo-wrap .combobox-wrapper { width: 100%; }
+
+.l-sous-total { font-weight: 600; color: var(--text-strong); text-align: right; display: flex; align-items: center; justify-content: flex-end; height: 34px; padding: 0 2px; }
+
+.totals-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.totals-cards.single { grid-template-columns: 1fr; }
+.total-card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; }
+.total-card .kpi-value { font-size: 21px; }
+.total-card .kpi-value-input {
+  width: 100%; border: none; background: transparent; padding: 0; margin-top: 4px;
+  font-size: 21px; font-weight: 700; color: var(--text-strong); font-family: inherit;
+}
+.total-card .kpi-value-input:disabled { color: var(--accent); -webkit-text-fill-color: var(--accent); opacity: 1; }
+.total-card .kpi-value-input:focus { outline: none; }
+
+.form-note { font-size: 12.5px; color: var(--text-muted); display: flex; gap: 8px; align-items: flex-start; margin-top: 4px; }
+.form-note .note-icon { flex: none; width: 15px; height: 15px; margin-top: 1px; opacity: 0.8; }
+
+.hr { border: none; border-top: 1px solid var(--line); margin: 16px 0; }
+
+.tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 1px solid var(--line); }
+.tab { padding: 9px 14px; font-size: 13.5px; cursor: pointer; color: var(--text-muted); border-bottom: 2px solid transparent; }
+.tab.active { color: var(--text-strong); border-color: var(--accent); font-weight: 600; }
+
+/* ===================== TABLEAU DE BORD ===================== */
+.dash-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 22px; }
+.dash-header h2 { font-size: 21px; margin: 0; }
+.dash-header .sub { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+.status-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 12px; border-radius: 5px;
+  background: var(--success-bg); color: var(--success);
+  font-size: 12px; font-weight: 700; white-space: nowrap;
+}
+.status-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); }
+
+.kpi-sub { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+.kpi-sub.up { color: var(--success); font-weight: 600; }
+.kpi-sub.down { color: var(--danger); font-weight: 600; }
+
+.card-accent { border-left: 3px solid transparent; }
+.card-accent-orange { border-left-color: var(--accent); }
+.card-accent-orange .kpi-label, .card-accent-orange .kpi-value { color: var(--accent); }
+.card-accent-green { border-left-color: var(--success); }
+.card-accent-green .kpi-label, .card-accent-green .kpi-value { color: var(--success); }
+
+.card-head-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 10px; }
+.card-head-title { display: flex; align-items: center; gap: 9px; font-size: 12.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-strong); }
+.icon-badge {
+  width: 26px; height: 26px; border-radius: 5px; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 13px; background: var(--indigo-bg); color: var(--indigo);
+}
+.icon-badge-danger { background: var(--danger-bg); color: var(--danger); }
+.pill-muted { background: var(--hover-bg); color: var(--text-muted); font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 5px; white-space: nowrap; }
+.pill-danger { background: var(--danger-bg); color: var(--danger); font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 5px; white-space: nowrap; }
+.chart-select { font-size: 12.5px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper-2); color: var(--text); }
+
+/* Classements avec barre de progression (produits / services les plus demandés) */
+.rank-row { margin-bottom: 14px; }
+.rank-row:last-child { margin-bottom: 0; }
+.rank-top { display: flex; align-items: baseline; justify-content: space-between; font-size: 13.5px; margin-bottom: 6px; gap: 10px; }
+.rank-name { color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rank-value { font-weight: 700; color: var(--indigo); flex-shrink: 0; }
+.rank-bar-bg { height: 6px; border-radius: 5px; background: var(--indigo-bg); overflow: hidden; }
+.rank-bar-fill { height: 100%; border-radius: 5px; background: var(--indigo); width: var(--w, 0%); }
+
+.count-badge { display: inline-block; min-width: 24px; padding: 2px 8px; text-align: center; border: 1px solid var(--line); border-radius: 5px; font-size: 12px; color: var(--text); background: var(--paper-2); }
+.client-top td { font-weight: 700; color: var(--text-strong); }
+
+/* État « rien à signaler » (alertes de stock) */
+.alert-ok { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 26px 10px; text-align: center; }
+.alert-ok .check { width: 40px; height: 40px; border-radius: 50%; background: var(--success-bg); color: var(--success); display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 10px; }
+.alert-ok .txt { color: var(--text-muted); font-size: 13px; }
+
+/* Liste des factures impayées */
+.invoice-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border-left: 3px solid var(--danger); margin-bottom: 8px; background: var(--danger-bg); border-radius: 5px; }
+.invoice-row:last-child { margin-bottom: 0; }
+.invoice-num { font-size: 12px; font-weight: 700; color: var(--text); background: var(--paper-2); border: 1px solid var(--line); border-radius: 5px; padding: 3px 9px; white-space: nowrap; }
+.invoice-amount { font-weight: 700; color: var(--danger); font-size: 13.5px; white-space: nowrap; }
+
+/* ===================== RESPONSIVE : petits écrans ===================== */
+@media (max-width: 860px) {
+  #auth-screen { flex-direction: column; height: auto; min-height: 100vh; }
+  .auth-panel { flex: none; width: 100%; padding: 28px 20px; }
+  .auth-presentation-inner { max-width: 460px; }
+  .auth-illustration { max-width: 240px; margin-bottom: 16px; }
+  .login-card { width: 100%; }
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .main { padding: 18px 14px 40px; }
+  .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+  .kpi-flow { grid-template-columns: repeat(2, 1fr); }
+}
+
+.invoice-print { display: none; }
+@media print {
+  @page { size: A4; margin: 12mm; }
+  body * { visibility: hidden; }
+  .invoice-print, .invoice-print * { visibility: visible; }
+  .invoice-print { display: block; position: absolute; top: 0; left: 0; width: 100%; padding: 0; page-break-inside: avoid; break-inside: avoid; }
+  .invoice-print, .invoice-print > div { page-break-after: avoid; }
+}
+
+/* ===================== CLASSES UTILITAIRES =====================
+   Générées à partir des styles auparavant en ligne dans app.js (mise en page
+   des formulaires, tableaux et documents imprimés). Les couleurs fixes
+   (#333, #111, #555…) concernent exclusivement les documents imprimés
+   (factures, reçus, rapports) : elles restent volontairement indépendantes
+   du thème clair/sombre de l'application, un document imprimé n'ayant pas
+   vocation à changer selon le thème à l'écran. */
+.bb-1px-solid-333 { border-bottom:1px solid #333; }
+.bb-1px-solid-var-line { border-bottom:1px solid var(--line); }
+.bb-2px-solid-333 { border-bottom:2px solid #333; }
+.bg-f2f2f2 { background:#f2f2f2; }
+.bg-paper { background:var(--paper); }
+.bl-1px-dashed-999 { border-left:1px dashed #999; }
+.block { display:block; }
+.border-1px-solid-333 { border:1px solid #333; }
+.border-1px-solid-var-line { border:1px solid var(--line); }
+.border-collapse { border-collapse:collapse; }
+.box-border { box-sizing:border-box; }
+.c-111 { color:#111; }
+.c-1155cc { color:#1155cc; }
+.c-555 { color:#555; }
+.c-777 { color:#777; }
+.flex { display:flex; }
+.flex-1 { flex:1; }
+.flex-1-4 { flex:1.4; }
+.flex-2 { flex:2; }
+.flex-col { flex-direction:column; }
+.flex-wrap { flex-wrap:wrap; }
+.font-print { font-family:'Segoe UI',Arial,sans-serif; }
+
+/* AJOUT (audit) : second modèle de document imprimé ("Moderne"), choisi
+   dans Paramètres > Modèle de document (meta.modeleDocument) et appliqué
+   uniformément aux factures, devis pro-forma et bons de livraison — voir
+   invoice.js#entete(). Couleur/mise en page distinctes du modèle
+   "Classique" existant (inchangé, reste la valeur par défaut). */
+.radius-round { border-radius: 50%; }
+.doc-mod-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.doc-mod-title { font-size: 26px; font-weight: 800; color: var(--modele-accent, #1789A8); }
+.doc-mod-rule { height: 3px; background: var(--modele-accent, #1789A8); border-radius: 2px; margin-bottom: 14px; }
+.doc-mod-logo { width: 56px; height: 56px; object-fit: contain; border-radius: 50%; flex-shrink: 0; }
+.doc-mod-badge { width: 56px; height: 56px; border-radius: 50%; background: var(--accent-2); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; flex-shrink: 0; }
+.doc-mod-company { font-size: 11.5px; line-height: 1.4; margin-bottom: 16px; }
+.doc-mod-company .name { font-size: 12.5px; font-weight: 700; margin-bottom: 3px; }
+.doc-mod-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+.doc-mod-infos { font-size: 11.5px; flex: 1; min-width: 140px; border-collapse: collapse; }
+.doc-mod-infos td { padding: 4px 10px 4px 0; }
+.doc-mod-infos td:first-child { color: #555; }
+.doc-mod-infos td:last-child { text-align: right; font-weight: 700; padding-right: 0; }
+.doc-mod-dest { font-size: 11.5px; min-width: 140px; }
+.doc-mod-dest .lbl { font-weight: 700; margin-bottom: 4px; }
+.doc-mod-total-ttc { color: var(--modele-accent, #1789A8); }
+/* Format compact A5×2 (printInvoice) : ces règles s'ajoutent aux
+   surcharges .inv-block.compact existantes (voir plus bas) pour que le
+   modèle "moderne" rétrécisse lui aussi proportionnellement. */
+.inv-block.compact .doc-mod-title { font-size: 18px; }
+.inv-block.compact .doc-mod-rule { margin-bottom: 8px; }
+.inv-block.compact .doc-mod-logo, .inv-block.compact .doc-mod-badge { width: 38px; height: 38px; font-size: 15px; }
+.inv-block.compact .doc-mod-company { font-size: 9.5px; margin-bottom: 8px; }
+.inv-block.compact .doc-mod-row { margin-bottom: 8px; }
+.inv-block.compact .doc-mod-infos, .inv-block.compact .doc-mod-dest { font-size: 9.5px; }
+
+/* AJOUT (audit) : 3e modèle de document imprimé ("Nomade"), inspiré d'un
+   visuel de facture élégant à bandeau rose et blocs Émetteur/Destinataire
+   côte à côte — voir invoice.js#entete() et #totauxTable(). Comme les
+   modèles précédents, s'applique uniformément aux 4 documents imprimés et
+   reste sans effet tant que meta.modeleDocument !== 'nomade'. */
+.doc-nom-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+.doc-nom-brand { display: flex; align-items: center; gap: 10px; }
+.doc-nom-logo { width: 48px; height: 48px; object-fit: contain; }
+.doc-nom-badge { width: 40px; height: 40px; border-radius: 8px; background: #C98A9C; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; flex-shrink: 0; }
+.doc-nom-brand-name { font-weight: 800; font-size: 15px; letter-spacing: 0.3px; }
+.doc-nom-title { font-size: 30px; font-weight: 800; letter-spacing: 1px; text-align: right; }
+.doc-nom-dates { font-size: 11.5px; color: #555; margin-top: 6px; }
+.doc-nom-row { display: flex; justify-content: space-between; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; }
+.doc-nom-col { font-size: 11.5px; min-width: 160px; }
+.doc-nom-col .lbl { font-weight: 800; letter-spacing: 0.5px; margin-bottom: 6px; color: #333; }
+.doc-nom-col.right { text-align: right; }
+.doc-nom-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 14px; }
+.doc-nom-table th { text-align: left; padding: 8px 4px; border-bottom: 1.5px solid #333; font-size: 11px; }
+.doc-nom-table td { padding: 8px 4px; border-bottom: 1px solid #E1DED4; }
+.doc-nom-totals { margin-left: auto; width: 260px; font-size: 12.5px; }
+.doc-nom-totals tr td { padding: 5px 0; }
+.doc-nom-totals td:last-child { text-align: right; }
+.doc-nom-totals .grand td { border-top: 2px solid #333; padding-top: 8px; font-weight: 800; font-size: 14px; }
+.doc-nom-reglement { font-size: 11px; margin-top: 24px; }
+.doc-nom-reglement .lbl { font-weight: 800; margin-bottom: 4px; }
+.doc-nom-footer { font-size: 9.5px; color: #777; margin-top: 22px; border-top: 1px solid #E1DED4; padding-top: 10px; }
+
+/* AJOUT (audit) : 4e modèle de document imprimé ("Essentiel"), inspiré
+   d'un visuel épuré avec bandeau vert, bloc Destinataire en tête et
+   remise affichée ligne par ligne dans le tableau (au lieu d'un total
+   agrégé comme sur "Nomade") — voir invoice.js#ligneEssentiel(). */
+.doc-ess-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
+.doc-ess-brand { display: flex; align-items: center; gap: 8px; }
+.doc-ess-logo { width: 34px; height: 34px; object-fit: contain; }
+.doc-ess-badge { width: 30px; height: 30px; border-radius: 50%; background: #2F9E63; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; flex-shrink: 0; }
+.doc-ess-brand-name { font-weight: 800; font-size: 13px; color: #2F9E63; }
+.doc-ess-dest { font-size: 11.5px; margin-top: 14px; }
+.doc-ess-dest .lbl { font-weight: 700; margin-bottom: 3px; }
+.doc-ess-dates { text-align: right; font-size: 11.5px; color: #444; }
+.doc-ess-title { text-align: center; font-size: 17px; font-weight: 700; margin: 18px 0; }
+.doc-ess-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 14px; }
+.doc-ess-table th { text-align: left; padding: 6px 4px; border-bottom: 1.5px solid #333; font-size: 11px; }
+.doc-ess-table td { padding: 6px 4px; }
+.doc-ess-table tr.total-row td { border-bottom: 1px solid #eee; }
+.doc-ess-table tr.remise-row td { color: #B23A3A; font-size: 11px; padding-top: 0; padding-bottom: 8px; }
+.doc-ess-totals { margin-left: auto; width: 240px; font-size: 12.5px; border-top: 1.5px solid #333; padding-top: 6px; }
+.doc-ess-totals tr td { padding: 4px 0; }
+.doc-ess-totals td:last-child { text-align: right; }
+.doc-ess-totals .grand td { font-weight: 800; font-size: 13.5px; }
+.doc-ess-footer { display: flex; justify-content: space-between; gap: 16px; font-size: 9.5px; color: #555; margin-top: 26px; border-top: 1px solid #E1DED4; padding-top: 10px; flex-wrap: wrap; }
+.doc-ess-footer .grp { min-width: 140px; }
+.doc-ess-footer .grp b { display: block; margin-bottom: 3px; color: #222; }
+
+/* AJOUT (audit) : récap Total HT / TVA / Total TTC pour les modèles
+   "Classique" et "Moderne" — jusque-là seuls "Nomade" et "Essentiel"
+   affichaient le détail de la TVA (voir invoice.js#totalsBlockApres). La
+   TVA doit maintenant toujours apparaître, quel que soit le modèle choisi. */
+.inv-tva-recap { margin-left: auto; width: 240px; font-size: 12px; margin-top: 6px; margin-bottom: 14px; }
+.inv-tva-recap tr td { padding: 3px 0; }
+.inv-tva-recap td:last-child { text-align: right; }
+.inv-tva-recap .grand td { border-top: 1.5px solid #333; padding-top: 6px; font-weight: 700; font-size: 12.5px; }
+.inv-block.compact .inv-tva-recap { font-size: 9.5px; width: 180px; margin-top: 2px; margin-bottom: 6px; }
+
+/* Cartes de sélection du modèle de document, module Paramètres. */
+.modele-doc-card { display: block; text-align: left; width: 220px; padding: 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper-2); cursor: pointer; }
+.modele-doc-card.active { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(217,142,43,0.18); }
+.modele-doc-name { font-weight: 700; font-size: 13px; margin-top: 10px; }
+.modele-doc-preview { height: 90px; border-radius: 4px; background: #fff; border: 1px solid var(--line); padding: 8px; overflow: hidden; }
+.modele-doc-preview-classique { display: flex; flex-direction: column; gap: 6px; }
+.modele-doc-preview-line { height: 6px; background: #ccc; border-radius: 2px; }
+.modele-doc-preview-table { flex: 1; margin-top: 4px; background: repeating-linear-gradient(#eee, #eee 4px, #fff 4px, #fff 10px); }
+.modele-doc-preview-moderne { display: flex; flex-direction: column; gap: 6px; }
+.modele-doc-preview-band { height: 12px; background: #1789A8; border-radius: 2px; }
+.modele-doc-preview-nomade { display: flex; flex-direction: column; gap: 6px; }
+.modele-doc-preview-nomade .modele-doc-preview-line:first-child { background: #C98A9C; height: 8px; }
+.modele-doc-preview-nomade .ml-auto { margin-left: auto; }
+.modele-doc-preview-essentiel { display: flex; flex-direction: column; gap: 6px; }
+.modele-doc-preview-band-thin { height: 5px; width: 40%; background: #2F9E63; border-radius: 2px; }
+.modele-doc-preview-essentiel .center { margin: 0 auto; }
+
+.fs-10_5 { font-size:10.5px; }
+.fs-11 { font-size:11px; }
+.fs-11_5 { font-size:11.5px; }
+.fs-12 { font-size:12px; }
+.fs-12_5 { font-size:12.5px; }
+.fs-13 { font-size:13px; }
+.fs-14 { font-size:14px; }
+.fs-20 { font-size:20px; }
+.fs-26 { font-size:26px; }
+.fs-30 { font-size:30px; }
+.fw-600 { font-weight:600; }
+.fw-800 { font-weight:800; }
+.fw-bold { font-weight:bold; }
+.gap-10 { gap:10px; }
+.gap-12 { gap:12px; }
+.gap-16 { gap:16px; }
+.gap-6 { gap:6px; }
+.gap-8 { gap:8px; }
+/* CORRECTIF (audit) : .lignes-header / .line-item imposent
+   `width: max-content; min-width: 100%` — indispensable pour la grille à
+   colonnes FIXES en pixels des autres modules (vente, achat...), où cette
+   largeur totale ne dépend jamais du contenu (somme de px constants), donc
+   l'en-tête et les lignes s'alignent forcément. Mais .grid-line-wide utilise
+   des colonnes en fractions (fr) : avec `width: max-content`, chaque ligne —
+   l'en-tête ET chaque ligne de données — calcule sa largeur totale
+   indépendamment, à partir de SON PROPRE contenu (le mot « Article » d'un
+   côté, la désignation complète du produit de l'autre). Les colonnes ne
+   s'alignaient donc pas entre l'en-tête et le tableau. En forçant `width:
+   100%` (et en neutralisant le `min-width: 100%` hérité, redondant ici), on
+   fait en sorte que l'en-tête ET toutes les lignes utilisent la même largeur
+   de référence (celle du conteneur .lignes-scroll) : les fractions (fr) sont
+   alors calculées sur cette base commune et les colonnes s'alignent
+   correctement quel que soit le contenu de chaque ligne. */
+.grid-line-wide { grid-template-columns:2.4fr 1fr 1fr 1fr auto; width: 100%; min-width: 0; }
+.h-190 { height:190px; }
+.h-210 { height:210px; }
+.h-40 { height:100px; }
+.h-52 { height:52px; }
+.h-76 { height:76px; }
+.h-84 { height:84px; }
+.hidden { display:none; }
+.items-center { align-items:center; }
+.items-start { align-items:flex-start; }
+.justify-between { justify-content:space-between; }
+.justify-start { justify-content:flex-start; }
+.lh-1_4 { line-height:1.4; }
+.m-12-0-6 { margin:12px 0 6px; }
+.m-12-0-8 { margin:12px 0 8px; }
+.maxw-220 { max-width:220px; }
+.maxw-720 { max-width:720px; }
+.mb-10 { margin-bottom:10px; }
+.mb-12 { margin-bottom:12px; }
+.mb-14 { margin-bottom:14px; }
+.mb-16 { margin-bottom:16px; }
+.mb-18 { margin-bottom:18px; }
+.mb-5 { margin-bottom:5px; }
+.mb-6 { margin-bottom:6px; }
+.mb-8 { margin-bottom:8px; }
+.minw-120 { min-width:120px; }
+.minw-140 { min-width:140px; }
+.minw-260 { min-width:260px; }
+.minw-90 { min-width:90px; }
+.mr-8 { margin-right:8px; }
+.mt-10 { margin-top:10px; }
+.mt-16 { margin-top:16px; }
+.mt-22 { margin-top:22px; }
+.mt-4 { margin-top:4px; }
+.mt-6 { margin-top:6px; }
+.muted { color:var(--text-muted); }
+.nowrap { white-space:nowrap; }
+.object-contain { object-fit:contain; }
+.overflow-hidden { overflow:hidden; }
+.overflow-x-auto { overflow-x:auto; }
+.p-14-0-4 { padding:14px 0 4px; }
+.p-14-16 { padding:14px 16px; }
+.p-4-0 { padding:4px 0; }
+.p-6 { padding:6px; }
+.p-6-0 { padding:6px 0; }
+.p-7-10 { padding:7px 10px; }
+.p-7-8 { padding:7px 8px; }
+.p-8-10 { padding:8px 10px; }
+.p-9-12 { padding:9px 12px; }
+.pb-10 { padding-bottom:10px; }
+.pl-6mm { padding-left:6mm; }
+.pr-6mm { padding-right:6mm; }
+.radius-6 { border-radius:6px; }
+.radius-8 { border-radius:8px; }
+.table-fixed { table-layout:fixed; }
+.text-center { text-align:center; }
+.text-danger { color:var(--danger); }
+.text-ellipsis { text-overflow:ellipsis; }
+.text-right { text-align:right; }
+.text-success { color:var(--success); }
+.underline { text-decoration:underline; }
+.w-100p { width:100%; }
+.w-10p { width:10%; }
+.w-14p { width:14%; }
+.w-16p { width:16%; }
+.w-17p { width:17%; }
+.w-20p { width:20%; }
+.w-36p { width:36%; }
+.w-40p { width:40%; }
+.w-44p { width:44%; }
+.w-50p { width:50%; }
+.w-52 { width:52px; }
+.w-70p { width:70%; }
+.w-76 { width:76px; }
+.w-84 { width:84px; }
+.w-8p { width:8%; }
+
+/* Puce de légende de graphique : couleur fournie par donnée (--sw), donc
+   forcément dynamique par instance — seule la mise en forme est en CSS. */
+.legend-swatch { width: 10px; height: 10px; border-radius: 3px; background: var(--sw); display: inline-block; }
+
+/* Largeur de colonne de tableau de facture, fournie par donnée (--w). */
+.inv-col { width: var(--w); }
+
+.p-5-0 { padding: 5px 0; }
+
+/* ===================== BLOC FACTURE (impression) =====================
+   Remplace le calcul de tailles en ligne selon le format : `.inv-block` pour
+   le format A4 normal, `.inv-block.compact` pour le format A5×2 (deux
+   factures A5 côte à côte sur une page A4, texte réduit). Couleurs figées en
+   noir/gris/bleu : un document imprimé ne suit pas le thème clair/sombre de
+   l'application. */
+
+/* Facture A4 */
+.inv-block { font-size: 12.5px; }
+.inv-block .inv-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
+.inv-block .inv-brand { display: flex; gap: 12px; align-items: flex-start; }
+.inv-block .inv-logo { width: 76px; height: 76px; object-fit: contain; }
+.inv-block .inv-company { font-size: 11.5px; text-align: center; font-weight: bold; line-height: 1.4; }
+.inv-block .inv-company-name { font-size: 13px; }
+.inv-block .inv-meta { text-align: right; min-width: 260px; }
+/* CORRECTIF (demande client) : le titre du document ("FACTURE N° ...")
+   était aligné à droite, empilé au-dessus des lignes Doit/Date/Terme de
+   paiement à l'intérieur de .inv-meta — alors que les 3 autres documents
+   imprimés (facture groupée, devis pro-forma, bon de livraison) affichent
+   ce même titre centré, dans son propre bandeau pleine largeur, sous
+   l'en-tête. Recentré ici pour rester cohérent avec les autres modèles
+   "classique" ; voir invoice.js où <div class="inv-title"> est désormais
+   placé en dehors de .inv-meta, juste après .inv-head. */
+.inv-block .inv-title { font-size: 26px; font-weight: 800; margin-bottom: 14px; text-align: center; }
+.inv-block .inv-meta-line { margin-bottom: 5px; }
+.inv-block .inv-table { width: 100%; border-collapse: collapse; table-layout: fixed; margin-bottom: 10px; font-size: inherit; }
+.inv-block .inv-table th, .inv-block .inv-table td { border: 1px solid #333; padding: 6px; }
+.inv-block .inv-cell-wrap { word-wrap: break-word; }
+.inv-block .inv-detail { font-size: 10.5px; color: #555; }
+.inv-block .inv-total-line { margin-bottom: 16px; }
+.inv-block .inv-sign-gap { height: 100px; }
+.fact-espace {height: 10px; display: block; }
+
+/* Facture A5 */
+.inv-block.compact { font-size: 10.5px; }
+.inv-block.compact .inv-head { margin-bottom: 10px; }
+.inv-block.compact .inv-brand { gap: 8px; }
+.inv-block.compact .inv-logo { width: 52px; height: 52px; }
+.inv-block.compact .inv-company { font-size: 9.5px; }
+.inv-block.compact .inv-company-name { font-size: 11px; }
+.inv-block.compact .inv-meta { min-width: 150px; }
+.inv-block.compact .inv-title { font-size: 20px; margin-bottom: 8px; }
+.inv-block.compact .inv-table { margin-bottom: 6px; }
+.inv-block.compact .inv-table th, .inv-block.compact .inv-table td { padding: 4px; }
+.inv-block.compact .inv-detail { font-size: 8.5px; }
+.inv-block.compact .inv-total-line { margin-bottom: 10px; }
+.inv-block.compact .inv-sign-gap { height: 100px; }
+tbody tr:last-child td {
+    border-bottom: 1px solid #333 !important;
+}
+
+/* ===================== ÉCRAN DE CONNEXION : composants ===================== */
+.login-hint-legal { margin-top: 22px; text-align: left; }
+.fst-italic { font-style: italic; }
+.theme-toggle-icon-btn {
+  background: none; border: 1px solid var(--line); border-radius: 8px;
+  width: 34px; height: 34px; cursor: pointer; font-size: 15px;
+}
+.pwd-wrap { position: relative; }
+.pwd-input { padding-right: 64px; }
+.pwd-toggle-btn {
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; color: var(--text-muted); font-size: 12px;
+  cursor: pointer; padding: 4px 6px;
+}
+
+/* Variante des boutons fantômes utilisée sur le bandeau latéral (toujours
+   sombre, voir plus haut) : texte clair fixe et survol clair fixe,
+   indépendants du thème actif de l'application — le survol standard
+   (var(--hover-bg)) suit le thème et serait illisible sur un fond qui,
+   lui, ne change jamais. */
+.btn-ghost-dark { color: #E9ECF2; border-color: rgba(255,255,255,0.18); }
+.btn-ghost-dark:hover { background: rgba(255,255,255,0.06); }
+
+/* ------------------------- Combobox de recherche (produits/services) -------------------------
+   Remplace l'ancien <input list="..."> lié à un <datalist> : ce composant natif ne peut pas
+   être stylé et, selon l'OS/la résolution, sa liste de suggestions ne défile pas correctement
+   au-delà d'une dizaine d'éléments — d'où l'impossibilité de faire défiler la recherche de
+   produits/services sur le formulaire de vente. Ce menu déroulant "maison" est entièrement
+   scrollable et cliquable. */
+.combobox-wrapper { position: relative; flex: 2; }
+.combobox-input { width: 100%; }
+.combobox-dropdown {
+  display: none;
+  /* Positionné en JS (voir positionDropdown()) : "fixed" pour échapper au
+     découpage ("overflow") de tout conteneur ancêtre à défilement (tableau
+     d'articles, fenêtre modale) — voir le commentaire dans createCombobox(). */
+  position: fixed;
+  max-height: 280px;
+  overflow-y: auto;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  z-index: 1000;
+}
+.combobox-dropdown.open { display: block; }
+.combobox-option {
+  padding: 8px 10px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--text);
+  border-bottom: 1px solid var(--line);
+}
+.combobox-option:last-child { border-bottom: none; }
+.combobox-option:hover,
+.combobox-option.active { background: var(--hover-bg); }
+.combobox-empty { padding: 8px 10px; font-size: 13px; color: var(--text-muted); }
+
+/* ==================== Vignettes d'actions rapides (tableau de bord) ==================== */
+.quick-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.quick-action-tile {
+  flex: 1 1 160px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-strong);
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+.quick-action-tile:hover { background: var(--hover-bg); border-color: var(--accent); transform: translateY(-1px); }
+.quick-action-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--indigo-bg); color: var(--indigo);
+  font-size: 15px; flex-shrink: 0;
+}
+
+/* ==================== En-tête globale (recherche + raccourcis) ==================== */
+.app-header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; padding: 10px 22px;
+  background: var(--paper-2); border-bottom: 1px solid var(--line);
+}
+.global-search-wrap { position: relative; flex: 0 0 auto; width: 240px; }
+.global-search-input {
+  width: 100%; padding: 7px 12px 7px 32px;
+  border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.08);
+  color: #EAF0F4; font-size: 13px; outline: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease, width 0.18s ease;
+}
+.global-search-input::placeholder { color: #93A6BC; }
+.global-search-input:focus { background: rgba(255,255,255,0.13); border-color: var(--accent); width: 270px; }
+.global-search-icon {
+  position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+  color: #93A6BC; font-size: 12px; pointer-events: none;
+}
+.global-search-shortcut {
+  position: absolute; right: 7px; top: 50%; transform: translateY(-50%);
+  font-size: 10px; color: #93A6BC; background: transparent;
+  border: 1px solid rgba(255,255,255,0.16); padding: 1px 5px;
+  pointer-events: none;
+}
+.global-search-results {
+  display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+  max-height: 360px; overflow-y: auto;
+  background: var(--paper-2); border: 1px solid var(--line);
+  border-radius: var(--radius); box-shadow: var(--shadow); z-index: 1200;
+}
+.global-search-results.open { display: block; }
+.global-search-group-label {
+  padding: 6px 12px 4px; font-size: 10.5px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.04em; color: var(--text-muted);
+}
+.global-search-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 8px 12px; cursor: pointer; font-size: 13px; color: var(--text);
+  border-top: 1px solid var(--line);
+}
+.global-search-item:hover { background: var(--hover-bg); }
+.global-search-item .gs-sub { color: var(--text-muted); font-size: 11.5px; }
+.global-search-empty { padding: 12px; font-size: 12.5px; color: var(--text-muted); text-align: center; }
+
+/* ==================== Spinner de chargement (boutons) ==================== */
+.btn.btn-loading { position: relative; color: transparent !important; pointer-events: none; }
+.btn.btn-loading::after {
+  content: '';
+  position: absolute; left: 50%; top: 50%;
+  width: 14px; height: 14px; margin: -7px 0 0 -7px;
+  border: 2px solid rgba(255,255,255,0.55); border-top-color: #fff;
+  border-radius: 50%;
+  animation: btn-spin 0.6s linear infinite;
+}
+.btn.btn-loading.btn-ghost::after,
+.btn.btn-loading.btn-danger::after { border: 2px solid rgba(22,35,58,0.25); border-top-color: var(--text-strong); }
+@keyframes btn-spin { to { transform: rotate(360deg); } }
+
+/* ==================== Pagination ==================== */
+.pagination-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; padding: 10px 2px 2px; flex-wrap: wrap; font-size: 12.5px; color: var(--text-muted);
+}
+.pagination-controls { display: flex; align-items: center; gap: 6px; }
+.pagination-controls button {
+  min-width: 28px; height: 28px; padding: 0 6px;
+  border: 1px solid var(--line); background: var(--paper-2); color: var(--text);
+  border-radius: 6px; cursor: pointer; font-size: 12.5px;
+}
+.pagination-controls button:hover:not(:disabled) { background: var(--hover-bg); }
+.pagination-controls button:disabled { opacity: 0.4; cursor: not-allowed; }
+.pagination-controls button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.pagination-size-select { border: 1px solid var(--line); border-radius: 6px; padding: 4px 6px; background: var(--paper-2); color: var(--text); font-size: 12.5px; }
+
+/* ==================== Colonnes personnalisables ==================== */
+.col-picker-wrap { position: relative; display: inline-block; }
+.col-picker-menu {
+  display: none; position: absolute; right: 0; top: calc(100% + 4px);
+  min-width: 200px; background: var(--paper-2); border: 1px solid var(--line);
+  border-radius: var(--radius); box-shadow: var(--shadow); z-index: 1100; padding: 8px;
+}
+.col-picker-menu.open { display: block; }
+.col-picker-item { display: flex; align-items: center; gap: 8px; padding: 5px 6px; font-size: 12.5px; }
+.col-hidden { display: none !important; }
+
+/* ==================== Mode lecture seule (caissier) ==================== */
+.field-readonly-locked { background: var(--hover-bg) !important; color: var(--text-muted) !important; cursor: not-allowed !important; }
+
+/* ==================== Aperçu avant impression ==================== */
+.print-preview-scale {
+  background: #fff; color: #111;
+  border: 1px solid var(--line); border-radius: 4px;
+  padding: 14mm;
+  max-height: 65vh; overflow-y: auto;
+  font-size: 12px;
+}
+
+/* ==================== Centre de notifications persistantes ====================
+   Remplace les toasts qui disparaissaient au bout de 3,8s : chaque message
+   important reste consultable dans un panneau tant que l'utilisateur ne l'a
+   pas explicitement effacé. Un toast bref (animation d'entrée) continue de
+   s'afficher furtivement pour le retour immédiat, mais la trace persiste ici. */
+.notif-center-wrap { position: relative; }
+.notif-bell-btn {
+  position: relative; width: 36px; height: 36px; border-radius: 8px;
+  border: 1px solid var(--line); background: var(--paper); cursor: pointer;
+  font-size: 16px; display: flex; align-items: center; justify-content: center;
+  color: var(--text);
+}
+.notif-bell-btn:hover { background: var(--hover-bg); }
+.notif-badge {
+  position: absolute; top: -5px; right: -5px; min-width: 16px; height: 16px;
+  padding: 0 4px; border-radius: 999px; background: var(--danger); color: #fff;
+  font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+  line-height: 1;
+}
+.notif-panel {
+  display: none; position: absolute; right: 0; top: calc(100% + 8px);
+  width: 340px; max-height: 420px; overflow: hidden;
+  flex-direction: column; background: var(--paper-2); border: 1px solid var(--line);
+  border-radius: var(--radius); box-shadow: var(--shadow); z-index: 1300;
+}
+.notif-panel.open { display: flex; }
+.notif-panel-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 12px; border-bottom: 1px solid var(--line); font-size: 13px; font-weight: 700;
+}
+.notif-panel-list { overflow-y: auto; }
+.notif-item {
+  display: flex; align-items: flex-start; gap: 8px; padding: 10px 12px;
+  border-bottom: 1px solid var(--line); font-size: 12.5px; position: relative;
+}
+.notif-item.unread { background: var(--hover-bg); }
+.notif-item .notif-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+.notif-item.success .notif-dot { background: var(--success); }
+.notif-item.error .notif-dot { background: var(--danger); }
+.notif-item.info .notif-dot { background: var(--info); }
+.notif-item.warn .notif-dot { background: var(--warn); }
+.notif-item-body { flex: 1; min-width: 0; }
+.notif-item-msg { color: var(--text); word-break: break-word; }
+.notif-item-time { color: var(--text-muted); font-size: 10.5px; margin-top: 2px; }
+.notif-item-close { border: none; background: none; color: var(--text-muted); cursor: pointer; font-size: 13px; padding: 0 2px; }
+.notif-item-close:hover { color: var(--danger); }
+.notif-panel-empty { padding: 24px 12px; text-align: center; color: var(--text-muted); font-size: 12.5px; }
+
+/* ==================== Écran de chargement global ==================== */
+.global-loader {
+  display: none; position: fixed; inset: 0; z-index: 3000;
+  background: var(--overlay); flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+}
+.global-loader.active { display: flex; }
+.global-loader-spinner {
+  width: 42px; height: 42px; border-radius: 50%;
+  border: 4px solid rgba(255,255,255,0.25); border-top-color: var(--accent);
+  animation: btn-spin 0.7s linear infinite;
+}
+.global-loader-label { color: #fff; font-size: 13px; font-weight: 600; letter-spacing: 0.02em; }
+
+/* ==================== Tooltips explicatifs (data-tip) ====================
+   Léger système CSS pur, plus lisible et stylable que le title natif du
+   navigateur, utilisé sur les boutons/icônes dont l'action n'est pas
+   évidente au premier coup d'œil (colonnes, actions rapides…). */
+[data-tip] { position: relative; }
+[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute; left: 50%; bottom: calc(100% + 8px); transform: translateX(-50%) translateY(4px);
+  background: var(--ink); color: #fff; font-size: 11.5px; font-weight: 500;
+  padding: 6px 9px; border-radius: 6px; white-space: nowrap; max-width: 240px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  opacity: 0; pointer-events: none; transition: opacity 0.12s ease, transform 0.12s ease;
+  z-index: 2000;
+}
+[data-tip]::before {
+  content: ''; position: absolute; left: 50%; bottom: calc(100% + 3px); transform: translateX(-50%);
+  border: 5px solid transparent; border-top-color: var(--ink);
+  opacity: 0; pointer-events: none; transition: opacity 0.12s ease;
+}
+[data-tip]:hover::after, [data-tip]:focus-visible::after { opacity: 1; transform: translateX(-50%) translateY(0); }
+[data-tip]:hover::before, [data-tip]:focus-visible::before { opacity: 1; }
+
+/* ==================== Mode plein écran (tableau de bord / rapports) ==================== */
+.btn-fullscreen-toggle { display: inline-flex; align-items: center; gap: 6px; }
+body.focus-mode .app-topbar { display: none !important; }
+body.focus-mode .main { padding: 18px 26px; max-width: none; }
+body.focus-mode .focus-mode-exit-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px; padding: 8px 12px; background: var(--paper-2);
+  border: 1px solid var(--line); border-radius: var(--radius);
+}
+.focus-mode-exit-bar { display: none; }
+
+/* ==================== Validation dynamique des formulaires ==================== */
+.field-error-msg { color: var(--danger); font-size: 11.5px; margin-top: 3px; display: none; }
+.field-error-msg.show { display: block; }
+input.input-invalid, select.input-invalid, textarea.input-invalid { border-color: var(--danger) !important; background: var(--danger-bg); }
+input.input-valid, select.input-valid { border-color: var(--success) !important; }
+
+/* ==================== Case « Ne plus demander » (modales de confirmation) ==================== */
+.confirm-skip-row {
+  display: flex; align-items: center; gap: 8px; margin-top: 14px; padding-top: 12px;
+  border-top: 1px solid var(--line); font-size: 12.5px; color: var(--text-muted);
+}
+
+/* ==================== Flux d'activité (tableau de bord) ==================== */
+.activity-feed-item { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 12.5px; }
+.activity-feed-item:last-child { border-bottom: none; }
+.activity-feed-icon {
+  width: 26px; height: 26px; border-radius: 50%; background: var(--indigo-bg); color: var(--indigo);
+  display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;
+}
+.activity-feed-text { flex: 1; color: var(--text); }
+.activity-feed-time { color: var(--text-muted); font-size: 11px; white-space: nowrap; }
+
+/* ==================== Répartition par mode de paiement ==================== */
+.payment-split-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; }
+.payment-split-label { flex: 0 0 120px; font-size: 12.5px; color: var(--text); }
+.payment-split-bar-bg { flex: 1; height: 8px; border-radius: 4px; background: var(--hover-bg); overflow: hidden; }
+.payment-split-bar-fill { height: 100%; border-radius: 4px; background: var(--indigo); }
+.payment-split-value { flex: 0 0 auto; font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; }
+
+/* ==================== Autocomplétion des champs libres ==================== */
+.free-text-hint { font-size: 10.5px; color: var(--text-muted); margin-top: 2px; }
+
+/* ==================== Paramètres : modules pliables ====================
+   AJOUT (audit) : chaque section de la page Paramètres (Modèle de document,
+   Entreprise, Utilisateurs, Plan de comptes, Sauvegarde) peut désormais être
+   repliée individuellement au lieu d'avoir à scroller jusqu'en bas de la
+   page pour atteindre la section suivante. L'état plié/déplié de chaque
+   section est mémorisé (localStorage) et restauré à la prochaine visite. */
+.settings-section-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; cursor: pointer; user-select: none; }
+.settings-section-head:hover .settings-section-chevron { color: var(--text-strong); }
+.settings-section-chevron {
+  background: none; border: none; cursor: pointer; padding: 4px 6px; flex-shrink: 0;
+  font-size: 13px; color: var(--text-muted); transition: transform 0.15s ease; line-height: 1;
+}
+.settings-section.collapsed .settings-section-chevron { transform: rotate(-90deg); }
+.settings-section.collapsed .settings-section-body { display: none; }
+.settings-section-action { position: relative; z-index: 1; }
+.settings-toggle-all { white-space: nowrap; }

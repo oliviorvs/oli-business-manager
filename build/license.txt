@@ -1,0 +1,29 @@
+TERMES ET CONDITIONS D'UTILISATION
+
+OLI Business Manager
+
+1. ACCEPTATION
+
+En installant et en utilisant OLI Business Manager, vous reconnaissez avoir lu, compris et accepté les présents termes et conditions.
+
+2. UTILISATION DU LOGICIEL
+
+Le logiciel est destiné à la gestion des activités de l'entreprise et doit être utilisé conformément à la législation en vigueur.
+
+3. RESPONSABILITÉ
+
+L'utilisateur est responsable des informations saisies dans le logiciel ainsi que de l'utilisation qui en est faite.
+
+4. DONNÉES
+
+L'utilisateur est responsable de la sauvegarde de ses données. Il est recommandé d'effectuer régulièrement des sauvegardes.
+
+5. PROPRIÉTÉ
+
+Le logiciel, son code source, son interface et ses éléments graphiques restent la propriété de leur propriétaire respectif.
+
+6. ACCEPTATION
+
+En cliquant sur « J'accepte », vous confirmez accepter les présents termes et conditions.
+
+Si vous refusez ces conditions, l'installation sera interrompue.

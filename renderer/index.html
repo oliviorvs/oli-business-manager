@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OLI Business Manager</title>
+  <script>
+    // Appliqué avant le chargement du CSS/HTML pour éviter un flash du
+    // mauvais thème au démarrage.
+    (function () {
+      try {
+        var theme = localStorage.getItem('oli-theme');
+        if (theme === 'dark') document.documentElement.dataset.theme = 'dark';
+      } catch (e) { /* localStorage indisponible : thème clair par défaut */ }
+    })();
+  </script>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- ===================== ECRAN DE CONFIGURATION INITIALE (premier lancement) ===================== -->
+  <div id="setup-screen">
+    <div class="auth-panel auth-form-panel">
+      <div class="login-card" style="width:460px;">
+        <div class="login-brand">
+          <div>
+            <h1>Configuration initiale</h1>
+            <span>Première utilisation : créez le compte administrateur et renseignez votre entreprise.</span>
+          </div>
+        </div>
+        <div class="login-error" id="setup-error"></div>
+        <form id="setup-form">
+          <div class="field">
+            <label>Nom de l'entreprise</label>
+            <input type="text" id="setup-entreprise" placeholder="Nom de votre entreprise" required />
+          </div>
+          <div class="field">
+            <label>Logo de l'entreprise (optionnel)</label>
+            <div class="flex items-center gap-12">
+              <div class="login-mark" id="setup-logo-mark">
+                <img id="setup-logo-preview" class="hidden" alt="Logo" />
+                <span id="setup-logo-fallback">?</span>
+              </div>
+              <button type="button" class="btn btn-ghost btn-sm" id="setup-btn-logo">Choisir un fichier</button>
+              <input type="file" id="setup-logo-file" accept="image/*" class="hidden" />
+            </div>
+          </div>
+          <div class="two-col">
+            <div class="field"><label>Nom de l'administrateur</label><input type="text" id="setup-admin-nom" required /></div>
+            <div class="field"><label>Prénom</label><input type="text" id="setup-admin-prenom" /></div>
+          </div>
+          <div class="field">
+            <label>Nom d'utilisateur (e-mail)</label>
+            <input type="email" id="setup-admin-email" placeholder="admin@votre-entreprise.mg" required />
+          </div>
+          <div class="two-col">
+            <div class="field">
+              <label>Mot de passe</label>
+              <input type="password" id="setup-admin-password" placeholder="8 caractères minimum" required />
+            </div>
+            <div class="field">
+              <label>Confirmer le mot de passe</label>
+              <input type="password" id="setup-admin-password2" required />
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" id="setup-submit">Terminer la configuration</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== ECRAN D'AUTHENTIFICATION ===================== -->
+  <div id="auth-screen">
+    <div class="auth-panel auth-form-panel">
+      <div class="auth-presentation-inner">
+        <div class="login-mark welcome-mark" id="auth-logo-wrap">
+          <img id="auth-logo-img" class="hidden" alt="Logo de l'entreprise" />
+          <span id="auth-logo-fallback"></span>
+        </div>
+        <h1 class="auth-title" id="auth-title">OLI Business Manager</h1>
+        <span class="welcome-tagline">Ventes · Services · Stocks · Trésorerie</span>
+
+        <svg class="auth-illustration" viewBox="0 0 340 220" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="barGrad" x1="0" y1="1" x2="0" y2="0">
+              <stop offset="0%" stop-color="#123047"/>
+              <stop offset="100%" stop-color="#2FB6C4"/>
+            </linearGradient>
+            <linearGradient id="cardGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#1C3A52"/>
+              <stop offset="100%" stop-color="#122436"/>
+            </linearGradient>
+          </defs>
+          <rect x="10" y="18" width="300" height="184" rx="16" fill="url(#cardGrad)" stroke="#2FB6C4" stroke-opacity="0.35"/>
+          <rect x="34" y="130" width="26" height="50" rx="4" fill="url(#barGrad)"/>
+          <rect x="72" y="105" width="26" height="75" rx="4" fill="url(#barGrad)"/>
+          <rect x="110" y="80" width="26" height="100" rx="4" fill="url(#barGrad)"/>
+          <rect x="148" y="55" width="26" height="125" rx="4" fill="url(#barGrad)"/>
+          <polyline points="47,120 85,95 123,68 161,42 199,30" fill="none" stroke="#F2B155" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="199" cy="30" r="6" fill="#F2B155"/>
+          <circle cx="161" cy="42" r="4" fill="#F2B155" opacity="0.8"/>
+          <circle cx="123" cy="68" r="4" fill="#F2B155" opacity="0.8"/>
+          <g transform="translate(224,40)">
+            <circle cx="26" cy="26" r="26" fill="#D98E2B"/>
+            <text x="26" y="33" text-anchor="middle" font-size="22" font-weight="700" fill="#122436">Ar</text>
+          </g>
+          <g transform="translate(224,120)" opacity="0.95">
+            <rect width="56" height="44" rx="8" fill="#E9ECF2"/>
+            <line x1="10" y1="14" x2="46" y2="14" stroke="#8A94A6" stroke-width="3" stroke-linecap="round"/>
+            <line x1="10" y1="23" x2="46" y2="23" stroke="#8A94A6" stroke-width="3" stroke-linecap="round"/>
+            <line x1="10" y1="32" x2="30" y2="32" stroke="#8A94A6" stroke-width="3" stroke-linecap="round"/>
+          </g>
+        </svg>
+
+        <p class="welcome-text">
+          Amboary ny fitantanana ny orinasanao amin'ny vahaolana iray feno. OLI Business Manager dia manome anao ny fitaovana rehetra ilainao hifehezana ny varotra, ny serivisy, ny tahiry ary ny vola miditra sy mivoaka. Mitahiry fotoana, mampihena ny fahadisoana, ary mandray fanapahan-kevitra tsara kokoa amin'ny alalan'ny tatitra mazava sy marina.
+        </p>
+        <div class="login-hint login-hint-legal">Fitantanana iray. Fifehezana feno. Fahombiazana maharitra.<br/><span class="fst-italic">© 2026 OLI Business. Développé par OLI Tech - Olivio Rvs. Tous droits réservés.</span></div>
+      </div>
+    </div>
+
+    <div class="auth-panel auth-form-panel">
+      <div class="login-card">
+        <div class="login-brand justify-between">
+          <div>BIENVENUE</div>
+          <button type="button" id="btn-theme-login" title="Changer de thème" class="theme-toggle-icon-btn">🌙</button>
+        </div>
+        <div class="login-error" id="login-error"></div>
+        <form id="login-form">
+          <div class="field">
+            <label>Nom d'utilisateur</label>
+            <input type="email" id="login-email" placeholder="nom d'utilisateur" autocomplete="username" required />
+          </div>
+          <div class="field">
+            <label>Mot de passe</label>
+            <div class="pwd-wrap">
+              <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" required class="pwd-input" />
+              <button type="button" id="login-toggle-pass" class="pwd-toggle-btn">Afficher</button>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" id="login-submit">Se connecter</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== APPLICATION ===================== -->
+  <div id="app-shell">
+    <!-- ===================== BARRE SUPERIEURE (nav + recherche + utilisateur) ===================== -->
+    <div class="app-topbar">
+      <div class="app-topbar-row">
+        <div class="brand">
+          <div class="login-mark brand-mark" id="brand-mark">
+            <img id="brand-logo-img" class="hidden" alt="Logo de l'entreprise" />
+            <span id="brand-mark-fallback"></span>
+          </div>
+          <div class="brand-text">
+            <div class="name" id="brand-name">Business Manager</div>
+            <div class="ver">v2.1.5</div>
+          </div>
+        </div>
+
+        <nav class="topnav" id="nav-container"></nav>
+
+        <div class="topbar-right">
+          <div class="global-search-wrap">
+            <span class="global-search-icon">🔍</span>
+            <input type="text" id="global-search" class="global-search-input" placeholder="Rechercher une vente, un client, un produit…" autocomplete="off" />
+            <span class="global-search-shortcut">Ctrl+F</span>
+            <div class="global-search-results" id="global-search-results"></div>
+          </div>
+          <div id="readonly-mode-wrap"></div>
+          <button type="button" class="icon-btn" id="global-fullscreen-btn" data-focus-mode-btn data-tip="Masquer le menu pour plus d'espace">⛶</button>
+          <button type="button" class="icon-btn theme-toggle-btn" id="btn-theme" title="Changer de thème">🌙</button>
+          <div class="notif-center-wrap">
+            <button type="button" class="icon-btn" id="notif-bell-btn" data-tip="Centre de notifications">
+              🔔<span class="notif-badge hidden" id="notif-badge">0</span>
+            </button>
+            <div class="notif-panel" id="notif-panel">
+              <div class="notif-panel-head">
+                <span>Notifications</span>
+                <button type="button" class="btn btn-ghost btn-sm" id="notif-clear-all">Tout effacer</button>
+              </div>
+              <div class="notif-panel-list" id="notif-panel-list"></div>
+            </div>
+          </div>
+          <div class="topnav-item user-menu-item">
+            <div class="user-chip">
+              <div class="avatar" id="user-avatar">--</div>
+              <div class="user-meta">
+                <div class="u-name" id="user-name">—</div>
+                <div class="u-role" id="user-role">—</div>
+              </div>
+            </div>
+            <div class="dropdown user-dropdown">
+              <button type="button" id="btn-account">Mon compte</button>
+              <button type="button" id="btn-logout">Déconnexion</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="focus-mode-exit-bar" id="focus-mode-exit-bar">
+      <span>Mode plein écran actif — touche <strong>Échap</strong> pour quitter</span>
+      <button type="button" class="btn btn-ghost btn-sm btn-fullscreen-toggle" id="focus-mode-exit-btn" data-focus-mode-btn>⛶ Quitter le plein écran</button>
+    </div>
+    <main class="main" id="main-content"></main>
+  </div>
+
+  <!-- ===================== MODALE GENERIQUE ===================== -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal" id="modal">
+      <div class="modal-header">
+        <h3 id="modal-title">Titre</h3>
+        <button class="modal-close" id="modal-close">✕</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+      <div class="modal-footer" id="modal-footer"></div>
+    </div>
+  </div>
+
+  <!-- ===================== MODALE SECONDAIRE (imbriquée) =====================
+       Permet d'ouvrir un petit formulaire (ex. « + Nouveau client ») sans
+       fermer ni perdre la saisie du formulaire principal déjà ouvert. -->
+  <div class="modal-overlay modal-overlay-2" id="modal-overlay-2">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modal-title-2">Titre</h3>
+        <button class="modal-close" id="modal-close-2">✕</button>
+      </div>
+      <div class="modal-body" id="modal-body-2"></div>
+      <div class="modal-footer" id="modal-footer-2"></div>
+    </div>
+  </div>
+
+  <div class="toast-wrap" id="toast-wrap"></div>
+  <div class="invoice-print" id="invoice-print"></div>
+
+  <!-- ===================== ÉCRAN DE CHARGEMENT GLOBAL ===================== -->
+  <div class="global-loader" id="global-loader">
+    <div class="global-loader-spinner"></div>
+    <div class="global-loader-label" id="global-loader-label">Chargement…</div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

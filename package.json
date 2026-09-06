@@ -1,0 +1,62 @@
+{
+  "name": "oli-businesss-manager",
+  "version": "2.1.5",
+  "description": "Application de gestion des ventes, services, stocks et trésorerie",
+  "main": "src/main.js",
+  "author": "OLI Tech - Olivio Rvs",
+  "license": "LICENSED",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder",
+    "postinstall": "electron-rebuild -f -w better-sqlite3",
+    "migrate:sqlite": "node src/store/migrate-json-to-sqlite.js",
+    "test": "node tests_manuels/test_manuel_tva.js && node tests_manuels/test_manuel_recette.js && node tests_manuels/test_manuel_consommation.js && node tests_manuels/test_manuel_vente_achat.js"
+  },
+  "devDependencies": {
+    "@electron/rebuild": "^3.6.0",
+    "@types/nodemailer": "^8.0.1",
+    "electron": "^43.4.1",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "com.oli.businesss.manager",
+    "productName": "OLI Business Manager",
+    "icon": "assets/logo.png",
+    "files": [
+      "main.js",
+      "src/**/*",
+      "renderer/**/*",
+      "assets/**/*",
+      "utils/**/*"
+    ],
+    "asarUnpack": [
+      "**/node_modules/better-sqlite3/**/*"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "license": "build/license.txt",
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.3.0",
+    "nodemailer": "^9.0.5",
+    "pdf-lib": "^1.17.1"
+  }
+}
