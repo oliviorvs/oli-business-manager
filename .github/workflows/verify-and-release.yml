@@ -65,7 +65,7 @@ jobs:
         run: npm ci --no-audit --no-fund
 
       - name: Construire l’application
-        run: npm run dist -- --publish never
+        run: npm run dist
 
       - name: Archiver les installateurs
         uses: actions/upload-artifact@v4

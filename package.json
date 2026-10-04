@@ -8,7 +8,7 @@
   "private": true,
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder",
+    "dist": "electron-builder --publish=never",
     "migrate:sqlite": "node src/store/migrate-json-to-sqlite.js",
     "test": "node tests_manuels/test_manuel_tva.js && node tests_manuels/test_manuel_recette.js && node tests_manuels/test_manuel_consommation.js && node tests_manuels/test_manuel_vente_achat.js"
   },
@@ -20,7 +20,7 @@
   "build": {
     "appId": "com.oli.businesss.manager",
     "productName": "OLI Business Manager",
-    "icon": "assets/logo.png",
+    "icon": "assets/logo-app.png",
     "npmRebuild": false,
     "files": [
       "main.js",
