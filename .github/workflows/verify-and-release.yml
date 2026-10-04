@@ -35,10 +35,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - windows-2022
-          - macos-15
-          - ubuntu-22.04
+        include:
+          - os: windows-2022
+            installer: "*.exe"
+          - os: macos-15
+            installer: "*.dmg"
+          - os: ubuntu-22.04
+            installer: "*.AppImage"
     steps:
       - name: Récupérer le code
         uses: actions/checkout@v4
@@ -62,13 +65,13 @@ jobs:
         run: npm ci --no-audit --no-fund
 
       - name: Construire l’application
-        run: npm run dist
+        run: npm run dist -- --publish never
 
       - name: Archiver les installateurs
         uses: actions/upload-artifact@v4
         with:
           name: installateur-${{ matrix.os }}
-          path: dist/*
+          path: dist/${{ matrix.installer }}
           if-no-files-found: error
 
   release:

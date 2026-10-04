@@ -106,7 +106,7 @@ restauration.
 ## Construire un exécutable (.exe / .dmg / .AppImage)
 
 ```bash
-npm run dist
+npm run dist -- --publish never
 ```
 
 Le paquet `electron-builder` doit être installé (`npm install`, déjà listé
@@ -116,3 +116,8 @@ votre plateforme cible.
 
 La base de données utilise `better-sqlite3` 13 et ses binaires Node-API
 précompilés. Le rebuild natif d'Electron n'est pas nécessaire.
+
+Pour une publication par tag `v*`, `electron-builder` construit les
+installateurs sans les publier (`--publish never`). GitHub Actions collecte
+les installateurs comme artefacts, puis son job de release les joint à la
+Release GitHub.
