@@ -9,76 +9,109 @@ import { CURRENCY } from '../utils/constants.js';
 import { esc, money, qs } from '../utils/helpers.js';
 import { state } from '../utils/state.js';
 
+const dashboardCharts = new Map();
+
 export function axisMoney(n) {
   const abs = Math.abs(n);
   if (abs >= 1000) return (n / 1000).toLocaleString('fr-FR', { maximumFractionDigits: 1 }) + 'k ' + CURRENCY;
   return Math.round(n).toLocaleString('fr-FR') + ' ' + CURRENCY;
 }
 
-export function svgLineChart(labels, values, opts = {}) {
-  // CORRECTIF (audit) : avec un tableau `values` vide, `points` restait
-  // vide et `points[points.length - 1]` (== points[-1]) valait `undefined`
-  // — le `.toFixed(1)` suivant plantait alors avec un TypeError, faisant
-  // planter tout le rendu du dashboard. Ce cas ne pouvait pas se produire
-  // avant ce correctif (serieMensuelle avait toujours 6 mois), mais peut
-  // désormais survenir légitimement : le rôle "gestionnaire" reçoit un
-  // serieMensuelle vidé côté serveur pour les graphiques financiers
-  // masqués (voir rapport.service.js#dashboardStats). On retourne un état
-  // vide propre plutôt qu'un graphique cassé.
-  if (!values.length) return `<div class="muted">Aucune donnée</div>`;
-  const w = 600, h = 210, padL = 62, padB = 26, padT = 14, padR = 14;
-  const color = opts.color || '#5B5FE0';
-  const max = Math.max(...values, 1);
-  const min = Math.min(...values, 0);
-  const range = (max - min) || 1;
-  const stepX = (w - padL - padR) / Math.max(values.length - 1, 1);
-  const points = values.map((v, i) => [padL + i * stepX, padT + (h - padT - padB) * (1 - (v - min) / range)]);
-  const pathD = points.map((p, i) => (i === 0 ? 'M' : 'L') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
-  const areaD = pathD + ` L${points[points.length - 1][0].toFixed(1)},${h - padB} L${points[0][0].toFixed(1)},${h - padB} Z`;
-  const steps = 4;
-  let grid = '', yLabels = '';
-  for (let i = 0; i <= steps; i++) {
-    const y = padT + (h - padT - padB) * i / steps;
-    const val = max - (max - min) * i / steps;
-    grid += `<line x1="${padL}" y1="${y.toFixed(1)}" x2="${w - padR}" y2="${y.toFixed(1)}" stroke="#E1DED4" stroke-width="1"/>`;
-    yLabels += `<text x="${padL - 8}" y="${(y + 3).toFixed(1)}" font-size="9.5" fill="#5C6572" text-anchor="end">${esc(axisMoney(val))}</text>`;
-  }
-  const labelEvery = Math.max(1, Math.ceil(labels.length / 7));
-  const xLabels = labels.map((l, i) => (i % labelEvery === 0 || i === labels.length - 1) ? `<text x="${points[i][0].toFixed(1)}" y="${h - 8}" font-size="9" fill="#5C6572" text-anchor="middle">${esc(l)}</text>` : '').join('');
-  return `<svg viewBox="0 0 ${w} ${h}" class="w-100p h-190 block">${grid}${yLabels}<path d="${areaD}" fill="${color}22" stroke="none"/><path d="${pathD}" fill="none" stroke="${color}" stroke-width="2.5"/>${points.map((p) => `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.6" fill="${color}"/>`).join('')}${xLabels}</svg>`;
+function destroyDashboardCharts() {
+  for (const chart of dashboardCharts.values()) chart.destroy();
+  dashboardCharts.clear();
 }
 
-export function svgBarChart(labels, datasets) {
-  const w = 600, h = 230, padL = 62, padB = 28, padT = 16, padR = 14;
-  const allVals = datasets.flatMap((d) => d.values);
-  const max = Math.max(...allVals, 1);
-  const groupW = (w - padL - padR) / Math.max(labels.length, 1);
-  const barW = Math.min(20, (groupW - 12) / datasets.length);
-  let bars = '';
-  labels.forEach((lab, i) => {
-    const groupX = padL + i * groupW + (groupW - barW * datasets.length) / 2;
-    datasets.forEach((d, di) => {
-      const v = d.values[i] || 0;
-      const bh = (h - padT - padB) * (v / max);
-      const x = groupX + di * barW;
-      const y = h - padB - bh;
-      bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${(barW - 3).toFixed(1)}" height="${bh.toFixed(1)}" fill="${d.color}" rx="2"/>`;
-    });
-    bars += `<text x="${(groupX + (barW * datasets.length) / 2).toFixed(1)}" y="${h - 10}" font-size="9" fill="#5C6572" text-anchor="middle">${esc(lab)}</text>`;
-  });
-  const steps = 4;
-  let grid = '', yLabels = '';
-  for (let i = 0; i <= steps; i++) {
-    const y = padT + (h - padT - padB) * i / steps;
-    const val = max * (1 - i / steps);
-    grid += `<line x1="${padL}" y1="${y.toFixed(1)}" x2="${w - padR}" y2="${y.toFixed(1)}" stroke="#E1DED4" stroke-width="1"/>`;
-    yLabels += `<text x="${padL - 8}" y="${(y + 3).toFixed(1)}" font-size="9.5" fill="#5C6572" text-anchor="end">${esc(axisMoney(val))}</text>`;
-  }
-  return `<svg viewBox="0 0 ${w} ${h}" class="w-100p h-210 block">${grid}${yLabels}${bars}</svg>`;
+export function disposeDashboardCharts() {
+  destroyDashboardCharts();
 }
 
-export function chartLegend(items) {
-  return `<div class="flex gap-16 mt-6">${items.map((it) => `<div class="flex items-center gap-6 fs-12 muted"><span class="legend-swatch" style="--sw:${it.color}"></span>${esc(it.label)}</div>`).join('')}</div>`;
+function chartCanvas(id, label, height = 230) {
+  return `<div class="dashboard-chart" style="height:${height}px"><canvas id="${id}" role="img" aria-label="${esc(label)}"></canvas></div>`;
+}
+
+function axisChartOptions(formatValue = axisMoney, horizontal = false, formatTooltip = formatValue) {
+  const valueAxis = horizontal ? 'x' : 'y';
+  const categoryAxis = horizontal ? 'y' : 'x';
+  const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim() || '#6B7A82';
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    color: textColor,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        enabled: true,
+        callbacks: {
+          label: (context) => {
+            const value = horizontal ? context.parsed.x : context.parsed.y;
+            const prefix = context.dataset.label ? `${context.dataset.label} : ` : '';
+            return `${prefix}${formatTooltip(value)}`;
+          }
+        }
+      }
+    },
+    scales: {
+      [categoryAxis]: { grid: { display: false } },
+      [valueAxis]: { beginAtZero: true, ticks: { callback: formatValue } }
+    }
+  };
+}
+
+function lineChartConfig(labels, values, label, color) {
+  return {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label,
+        data: values,
+        borderColor: color,
+        backgroundColor: `${color}26`,
+        fill: true,
+        tension: 0.3,
+        pointRadius: 3,
+        pointHoverRadius: 6
+      }]
+    },
+    options: axisChartOptions(axisMoney, false, money)
+  };
+}
+
+function rankingChartConfig(items, nameKey, valueKey, currencyValues = false) {
+  const formatValue = currencyValues
+    ? axisMoney
+    : (value) => Number(value).toLocaleString('fr-FR');
+  return {
+    type: 'bar',
+    data: {
+      labels: items.map((item) => item[nameKey]),
+      datasets: [{
+        label: currencyValues ? 'Montant' : 'Quantité',
+        data: items.map((item) => item[valueKey]),
+        backgroundColor: '#5B5FE0',
+        borderRadius: 4
+      }]
+    },
+    options: {
+      ...axisChartOptions(formatValue, true, currencyValues ? money : formatValue),
+      indexAxis: 'y'
+    }
+  };
+}
+
+function mountDashboardChart(id, config) {
+  if (!window.Chart) throw new Error('Chart.js local est introuvable.');
+  const canvas = qs(`#${id}`);
+  if (!canvas) throw new Error(`Canvas du graphique introuvable : ${id}`);
+  const chart = new window.Chart(canvas, config);
+  dashboardCharts.set(id, chart);
+  return chart;
+}
+
+function mountRankingChart(id, items, nameKey, valueKey, currencyValues = false) {
+  if (items.length) mountDashboardChart(id, rankingChartConfig(items, nameKey, valueKey, currencyValues));
 }
 
 
@@ -88,38 +121,6 @@ export function kpiTrend(cur, prev, suffix) {
   const sign = delta >= 0 ? '↑' : '↓';
   const cls = delta >= 0 ? 'up' : 'down';
   return `<div class="kpi-sub ${cls}">${sign} ${Math.abs(delta).toFixed(0)}% ${esc(suffix)}</div>`;
-}
-
-// Classement avec barre de progression (produits les plus vendus, services les plus demandés)
-export function rankingBars(items, nameKey, valueKey) {
-  if (!items.length) return '<div class="muted">Aucune donnée</div>';
-  const max = Math.max(...items.map((i) => i[valueKey]), 1);
-  return items.map((i) => `
-    <div class="rank-row">
-      <div class="rank-top"><span class="rank-name">${esc(i[nameKey])}</span><span class="rank-value">${i[valueKey]}</span></div>
-      <div class="rank-bar-bg"><div class="rank-bar-fill" style="--w:${Math.max(4, (i[valueKey] / max) * 100).toFixed(1)}%"></div></div>
-    </div>`).join('');
-}
-
-export function svgPieChart(slices, opts = {}) {
-  const size = opts.size || 190;
-  const cx = size / 2, cy = size / 2, r = size / 2 - 6;
-  const total = slices.reduce((s, sl) => s + sl.value, 0);
-  if (!total) return `<div class="muted">Aucune donnée</div>`;
-  let angle = -Math.PI / 2;
-  const paths = slices.filter((sl) => sl.value > 0).map((sl) => {
-    const frac = sl.value / total;
-    const a0 = angle;
-    const a1 = angle + frac * Math.PI * 2;
-    angle = a1;
-    const x0 = cx + r * Math.cos(a0), y0 = cy + r * Math.sin(a0);
-    const x1 = cx + r * Math.cos(a1), y1 = cy + r * Math.sin(a1);
-    const large = (a1 - a0) > Math.PI ? 1 : 0;
-    // Cas particulier : une seule tranche = 100 % (le tracé d'arc dégénère) → cercle plein.
-    if (frac >= 0.999) return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${sl.color}"/>`;
-    return `<path d="M${cx},${cy} L${x0.toFixed(2)},${y0.toFixed(2)} A${r},${r} 0 ${large} 1 ${x1.toFixed(2)},${y1.toFixed(2)} Z" fill="${sl.color}" stroke="var(--paper-2)" stroke-width="1.5"/>`;
-  }).join('');
-  return `<svg viewBox="0 0 ${size} ${size}" class="block" style="width:${size}px;height:${size}px;margin:0 auto;">${paths}</svg>`;
 }
 
 // ------------------------- Tableau de bord — rôle Caissier -------------------------
@@ -158,15 +159,17 @@ async function renderDashboardCaissier() {
   const rankingCards = [
     `<div class="card">
         <div class="card-head-row"><div class="card-head-title"><span class="icon-badge"></span>Produits les plus vendus</div></div>
-        ${rankingBars(stats.produitsPlusVendus, 'designation', 'quantite')}
+      ${stats.produitsPlusVendus.length ? chartCanvas('dash-products-ranking', 'Produits les plus vendus', Math.max(210, stats.produitsPlusVendus.length * 32)) : '<div class="muted">Aucune donnée</div>'}
       </div>`,
     `<div class="card">
         <div class="card-head-row"><div class="card-head-title"><span class="icon-badge"></span>Services les plus demandés</div></div>
-        ${rankingBars(stats.servicesPlusDemandes, 'nom', 'quantite')}
+      ${stats.servicesPlusDemandes.length ? chartCanvas('dash-services-ranking', 'Services les plus demandés', Math.max(210, stats.servicesPlusDemandes.length * 32)) : '<div class="muted">Aucune donnée</div>'}
       </div>`
   ];
 
   body.innerHTML = `${quickActionsHtml}<div class="grid grid-2">${rankingCards.join('')}</div>`;
+  mountRankingChart('dash-products-ranking', stats.produitsPlusVendus, 'designation', 'quantite');
+  mountRankingChart('dash-services-ranking', stats.servicesPlusDemandes, 'nom', 'quantite');
 
   qs('#qa-vente')?.addEventListener('click', async () => {
     state.currentModule = 'ventes'; renderNav();
@@ -187,6 +190,7 @@ async function renderDashboardCaissier() {
 }
 
 export async function renderDashboard(joursCA = 14) {
+  destroyDashboardCharts();
   if (state.session.role === 'caissier') return renderDashboardCaissier();
   const main = qs('#main-content');
   main.innerHTML = `
@@ -288,17 +292,13 @@ export async function renderDashboard(joursCA = 14) {
           <div class="card-head-title">Chiffre d'affaires</div>
           <select class="chart-select" id="dash-ca-period">${periodesCA.map((j) => `<option value="${j}" ${j === joursCA ? 'selected' : ''}>${j} derniers jours</option>`).join('')}</select>
         </div>
-        <div id="dash-ca-chart-inner">${svgLineChart(stats.serieCaJournaliere.map((s) => s.label), stats.serieCaJournaliere.map((s) => s.valeur), { color: '#5B5FE0' })}</div>
+        <div id="dash-ca-chart-inner">${chartCanvas('dash-ca-chart', 'Chiffre d’affaires')}</div>
       </div>`;
   const recettesDepensesChartCard = `<div class="card">
         <div class="card-head-row">
           <div class="card-head-title">Recettes vs Dépenses</div>
         </div>
-        ${svgBarChart(stats.serieMensuelle.map((s) => s.label), [
-          { label: 'Recettes', color: '#5B5FE0', values: stats.serieMensuelle.map((s) => s.recettes) },
-          { label: 'Dépenses', color: '#B23A3A', values: stats.serieMensuelle.map((s) => s.depenses) }
-        ])}
-        ${chartLegend([{ label: 'Recettes', color: '#5B5FE0' }, { label: 'Dépenses', color: '#B23A3A' }])}
+        ${chartCanvas('dash-income-expenses-chart', 'Recettes et dépenses mensuelles')}
       </div>`;
 
   // AMÉLIORATION (audit) : la liste d'alertes n'avait aucune limite
@@ -349,27 +349,20 @@ export async function renderDashboard(joursCA = 14) {
   // Répartition du CA du mois entre produits et services (camembert).
   const repartitionCaCard = `<div class="card">
         <div class="card-head-row"><div class="card-head-title"><span class="icon-badge"></span>Répartition du CA (mois)</div></div>
-        ${svgPieChart([{ label: 'Produits', value: stats.caProduitsMois, color: '#5B5FE0' }, { label: 'Services', value: stats.caServicesMois, color: '#F2B155' }])}
-        ${chartLegend([{ label: `Produits — ${money(stats.caProduitsMois)}`, color: '#5B5FE0' }, { label: `Services — ${money(stats.caServicesMois)}`, color: '#F2B155' }])}
+        ${stats.caProduitsMois || stats.caServicesMois ? chartCanvas('dash-ca-split-chart', 'Répartition du chiffre d’affaires entre produits et services') : '<div class="muted">Aucune donnée</div>'}
       </div>`;
 
   // Répartition des ventes du mois par mode de paiement.
-  const maxPaiement = Math.max(...stats.repartitionPaiementsMois.map((p) => p.montant), 1);
   const repartitionPaiementsCard = `<div class="card">
         <div class="card-head-row"><div class="card-head-title"><span class="icon-badge"></span>Ventes par mode de paiement (mois)</div></div>
-        ${stats.repartitionPaiementsMois.length ? stats.repartitionPaiementsMois.map((p) => `
-          <div class="payment-split-row">
-            <div class="payment-split-label">${esc(p.label)}</div>
-            <div class="payment-split-bar-bg"><div class="payment-split-bar-fill" style="width:${Math.max(3, (p.montant / maxPaiement) * 100).toFixed(1)}%"></div></div>
-            <div class="payment-split-value">${money(p.montant)}</div>
-          </div>`).join('') : '<div class="muted">Aucune vente ce mois-ci</div>'}
+        ${stats.repartitionPaiementsMois.length ? chartCanvas('dash-payment-methods-chart', 'Ventes ventilées par mode de paiement') : '<div class="muted">Aucune vente ce mois-ci</div>'}
       </div>`;
 
   // Tendance du bénéfice net sur 6 mois (réservé aux rôles ayant accès aux
   // informations financières sensibles, comme le solde de trésorerie ci-dessus).
   const beneficeNetTrendCard = `<div class="card mb-16">
       <div class="card-head-title mb-10">Tendance du bénéfice net — 6 derniers mois</div>
-      ${svgLineChart(stats.serieMensuelle.map((s) => s.label), stats.serieMensuelle.map((s) => s.beneficeNet), { color: '#2F7D5C' })}
+      ${chartCanvas('dash-net-profit-chart', 'Tendance du bénéfice net sur six mois')}
     </div>`;
 
   // Flux d'activité : 5 dernières actions effectuées dans l'application.
@@ -400,20 +393,17 @@ export async function renderDashboard(joursCA = 14) {
   const rankingCards = [
     `<div class="card">
         <div class="card-head-row"><div class="card-head-title"><span class="icon-badge"></span>Produits les plus vendus</div></div>
-        ${rankingBars(stats.produitsPlusVendus, 'designation', 'quantite')}
+        ${stats.produitsPlusVendus.length ? chartCanvas('dash-products-ranking', 'Produits les plus vendus', Math.max(210, stats.produitsPlusVendus.length * 32)) : '<div class="muted">Aucune donnée</div>'}
       </div>`,
     `<div class="card">
         <div class="card-head-row"><div class="card-head-title"><span class="icon-badge"></span>Services les plus demandés</div></div>
-        ${rankingBars(stats.servicesPlusDemandes, 'nom', 'quantite')}
+        ${stats.servicesPlusDemandes.length ? chartCanvas('dash-services-ranking', 'Services les plus demandés', Math.max(210, stats.servicesPlusDemandes.length * 32)) : '<div class="muted">Aucune donnée</div>'}
       </div>`
   ];
   if (!hideSensitiveFinance) {
     rankingCards.push(`<div class="card">
         <div class="card-head-row"><div class="card-head-title"><span class="icon-badge"></span>Top fournisseurs</div></div>
-        ${stats.topFournisseurs.length ? stats.topFournisseurs.map((f) => `
-          <div class="rank-row">
-            <div class="rank-top"><span class="rank-name">${esc(f.nom)}</span><span class="rank-value">${money(f.montant)}</span></div>
-          </div>`).join('') : '<div class="muted">Aucune donnée</div>'}
+        ${stats.topFournisseurs.length ? chartCanvas('dash-suppliers-ranking', 'Fournisseurs classés par montant des achats', Math.max(210, stats.topFournisseurs.length * 32)) : '<div class="muted">Aucune donnée</div>'}
       </div>`);
   }
 
@@ -426,7 +416,7 @@ export async function renderDashboard(joursCA = 14) {
     <div class="grid grid-2 mb-16">${repartitionCaCard}${repartitionPaiementsCard}</div>
     ${hideSensitiveFinance ? '' : `<div class="card mb-16">
       <div class="card-head-title mb-10">Solde de trésorerie — fin de mois, 6 derniers mois</div>
-      ${svgLineChart(stats.serieMensuelle.map((s) => s.label), stats.serieMensuelle.map((s) => s.soldeTresorerie), { color: '#5B5FE0' })}
+      ${chartCanvas('dash-treasury-chart', 'Solde de trésorerie de fin de mois sur six mois')}
     </div>`}
     ${hideSensitiveFinance ? '' : beneficeNetTrendCard}
     ${activiteFeedCard}
@@ -439,14 +429,106 @@ export async function renderDashboard(joursCA = 14) {
       ${stats.meilleursClients.length ? `<table><thead><tr><th>Client</th><th class="text-right">Nombre d'achats</th><th class="text-right">Total dépensé</th></tr></thead><tbody>${stats.meilleursClients.map((c, i) => `<tr class="${i === 0 ? 'client-top' : ''}"><td>${esc(c.nom)}</td><td class="text-right"><span class="count-badge">${c.nombreAchats}</span></td><td class="text-right">${money(c.montant)}</td></tr>`).join('')}</tbody></table>` : '<div class="muted">Aucune donnée — seuls les clients enregistrés (pas « comptoir ») apparaissent ici.</div>'}
     </div>
     <div class="grid grid-${lastRowCards.length}">${lastRowCards.join('')}</div>`;
+
+  const dailySeries = stats.serieCaJournaliere;
+  mountDashboardChart('dash-ca-chart', lineChartConfig(
+    dailySeries.map((item) => item.label),
+    dailySeries.map((item) => item.valeur),
+    'Chiffre d’affaires',
+    '#5B5FE0'
+  ));
+  if (!hideSensitiveFinance) {
+    mountDashboardChart('dash-income-expenses-chart', {
+      type: 'bar',
+      data: {
+        labels: stats.serieMensuelle.map((item) => item.label),
+        datasets: [
+          { label: 'Recettes', data: stats.serieMensuelle.map((item) => item.recettes), backgroundColor: '#5B5FE0' },
+          { label: 'Dépenses', data: stats.serieMensuelle.map((item) => item.depenses), backgroundColor: '#B23A3A' }
+        ]
+      },
+      options: {
+        ...axisChartOptions(axisMoney, false, money),
+        plugins: {
+          ...axisChartOptions(axisMoney, false, money).plugins,
+          legend: { display: true, position: 'bottom' }
+        }
+      }
+    });
+  }
+  if (stats.caProduitsMois || stats.caServicesMois) {
+    mountDashboardChart('dash-ca-split-chart', {
+      type: 'doughnut',
+      data: {
+        labels: ['Produits', 'Services'],
+        datasets: [{
+          data: [stats.caProduitsMois, stats.caServicesMois],
+          backgroundColor: ['#5B5FE0', '#F2B155'],
+          borderColor: 'transparent'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        color: getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim() || '#6B7A82',
+        plugins: {
+          legend: { display: true, position: 'bottom' },
+          tooltip: {
+            callbacks: {
+              label: (context) => {
+                const total = context.dataset.data.reduce((sum, value) => sum + value, 0);
+                const percent = total ? (context.raw / total * 100).toLocaleString('fr-FR', { maximumFractionDigits: 1 }) : '0';
+                return `${context.label} : ${money(context.raw)} (${percent} %)`;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+  if (stats.repartitionPaiementsMois.length) {
+    mountDashboardChart('dash-payment-methods-chart', {
+      type: 'bar',
+      data: {
+        labels: stats.repartitionPaiementsMois.map((item) => item.label),
+        datasets: [{
+          label: 'Montant encaissé',
+          data: stats.repartitionPaiementsMois.map((item) => item.montant),
+          backgroundColor: '#5B5FE0',
+          borderRadius: 4
+        }]
+      },
+      options: { ...axisChartOptions(axisMoney, true, money), indexAxis: 'y' }
+    });
+  }
+  mountRankingChart('dash-products-ranking', stats.produitsPlusVendus, 'designation', 'quantite');
+  mountRankingChart('dash-services-ranking', stats.servicesPlusDemandes, 'nom', 'quantite');
+  if (!hideSensitiveFinance) {
+    mountRankingChart('dash-suppliers-ranking', stats.topFournisseurs, 'nom', 'montant', true);
+    mountDashboardChart('dash-net-profit-chart', lineChartConfig(
+      stats.serieMensuelle.map((item) => item.label),
+      stats.serieMensuelle.map((item) => item.beneficeNet),
+      'Bénéfice net',
+      '#2F7D5C'
+    ));
+    mountDashboardChart('dash-treasury-chart', lineChartConfig(
+      stats.serieMensuelle.map((item) => item.label),
+      stats.serieMensuelle.map((item) => item.soldeTresorerie),
+      'Solde de trésorerie',
+      '#5B5FE0'
+    ));
+  }
   qs('#dash-ca-period').addEventListener('change', async (e) => {
     const select = e.target;
     const jours = Number(select.value);
     select.disabled = true;
     try {
-      const chartInner = qs('#dash-ca-chart-inner');
+      const chart = dashboardCharts.get('dash-ca-chart');
       const nouvellesStats = await call('dashboard:stats', { jours });
-      chartInner.innerHTML = svgLineChart(nouvellesStats.serieCaJournaliere.map((s) => s.label), nouvellesStats.serieCaJournaliere.map((s) => s.valeur), { color: '#5B5FE0' });
+      if (dashboardCharts.get('dash-ca-chart') !== chart) return;
+      chart.data.labels = nouvellesStats.serieCaJournaliere.map((item) => item.label);
+      chart.data.datasets[0].data = nouvellesStats.serieCaJournaliere.map((item) => item.valeur);
+      chart.update();
     } finally {
       select.disabled = false;
     }

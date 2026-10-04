@@ -1,6 +1,6 @@
 {
   "name": "oli-businesss-manager",
-  "version": "2.1.5",
+  "version": "1.0.0",
   "description": "Application de gestion des ventes, services, stocks et trésorerie",
   "main": "src/main.js",
   "author": "OLI Tech - Olivio Rvs",
@@ -27,6 +27,7 @@
       "main.js",
       "src/**/*",
       "renderer/**/*",
+      "vendor/**/*",
       "assets/**/*",
       "utils/**/*"
     ],

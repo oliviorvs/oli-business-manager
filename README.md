@@ -27,8 +27,11 @@ disponible pour la plateforme cible.
 - Authentification par rôle (Administrateur / Gestionnaire / Caissier)
 - **Mon compte** : chaque utilisateur (y compris l'administrateur) peut modifier
   son propre nom, prénom, e-mail et mot de passe depuis la barre latérale
-- Tableau de bord avec indicateurs clés **et graphiques** (chiffre d'affaires
-  sur 14 jours, recettes vs dépenses et solde de trésorerie sur 6 mois)
+- Tableau de bord avec indicateurs clés et graphiques interactifs Chart.js
+  (chiffre d'affaires sur 14 jours, recettes vs dépenses, solde de trésorerie
+  sur 6 mois et valeurs détaillées au survol)
+- Chart.js est fourni localement dans `vendor/chart.js` et inclus dans les
+  exécutables ; il n'est pas téléchargé depuis `node_modules` à l'exécution.
 - Clients (fiche, historique des achats/prestations)
 - Fournisseurs
 - Catégories et produits (avec unité de mesure et seuils d'alerte de stock)

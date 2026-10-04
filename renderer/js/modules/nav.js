@@ -1,6 +1,6 @@
 import { renderAchats } from './achats.js';
 import { renderClients } from './clients.js';
-import { renderDashboard } from './dashboard.js';
+import { disposeDashboardCharts, renderDashboard } from './dashboard.js';
 import { renderDepenses } from './depenses.js';
 import { renderFournisseurs } from './fournisseurs.js';
 import { renderJournal } from './journal.js';
@@ -30,6 +30,7 @@ export function allowed(moduleKey) {
 // contient (pour le rôle courant) qu'une seule entrée devient un lien direct ;
 // les autres s'ouvrent en menu déroulant au survol.
 export function renderNav() {
+  if (state.currentModule !== 'dashboard') disposeDashboardCharts();
   const container = qs('#nav-container');
   container.innerHTML = '';
   NAV.forEach((group) => {
@@ -189,4 +190,3 @@ export function setupGlobalFullscreenToggle() {
   bindFullscreenToggle('focus-mode-exit-btn');
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isFocusModeActive()) toggleFocusMode(); });
 }
-
