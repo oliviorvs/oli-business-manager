@@ -6,7 +6,7 @@ des dépenses et de la trésorerie.
 
 ## Installation
 
-Prérequis : [Node.js](https://nodejs.org) 18 ou plus récent (installe `npm`).
+Prérequis : [Node.js](https://nodejs.org) 22.12 ou plus récent (installe `npm`).
 
 ```bash
 cd oli-business-manager
@@ -113,3 +113,6 @@ Le paquet `electron-builder` doit être installé (`npm install`, déjà listé
 dans les dépendances de développement) et nécessite une connexion internet
 la première fois pour télécharger les binaires Electron correspondant à
 votre plateforme cible.
+
+La base de données utilise `better-sqlite3` 13 et ses binaires Node-API
+précompilés. Le rebuild natif d'Electron n'est pas nécessaire.

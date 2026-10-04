@@ -22,7 +22,7 @@ jobs:
       - name: Installer Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 22.12.0
 
       - name: Vérifier les fichiers JavaScript
         run: git ls-files -z -- '*.js' | xargs -0 -r -n1 node --check
@@ -37,8 +37,8 @@ jobs:
       matrix:
         os:
           - windows-2022
-          - macos-latest
-          - ubuntu-latest
+          - macos-15
+          - ubuntu-22.04
     steps:
       - name: Récupérer le code
         uses: actions/checkout@v4
@@ -46,10 +46,20 @@ jobs:
       - name: Installer Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 22.12.0
+
+      - name: Installer Python 3.12 pour les modules natifs Windows
+        if: runner.os == 'Windows'
+        uses: actions/setup-python@v5
+        id: setup-python
+        with:
+          python-version: "3.12"
 
       - name: Installer les dépendances
-        run: npm install --no-audit --no-fund
+        env:
+          npm_config_msvs_version: ${{ runner.os == 'Windows' && '2022' || '' }}
+          PYTHON: ${{ runner.os == 'Windows' && steps.setup-python.outputs.python-path || '' }}
+        run: npm ci --no-audit --no-fund
 
       - name: Construire l’application
         run: npm run dist
