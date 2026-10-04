@@ -110,3 +110,7 @@ Le paquet `electron-builder` doit être installé (`npm install`, déjà listé
 dans les dépendances de développement) et nécessite une connexion internet
 la première fois pour télécharger les binaires Electron correspondant à
 votre plateforme cible.
+
+Le workflow GitHub vérifie la syntaxe JavaScript à chaque push et pull
+request. Pour publier les installateurs Windows, macOS et Linux dans une
+release GitHub, envoyez un tag commençant par `v` (par exemple `v2.1.6`).

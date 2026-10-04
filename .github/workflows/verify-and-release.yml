@@ -1,0 +1,86 @@
+name: Verification et publication
+
+on:
+  push:
+    branches:
+      - "**"
+    tags:
+      - "v*"
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  syntax:
+    name: Vérification de la syntaxe JavaScript
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Installer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Vérifier les fichiers JavaScript
+        run: git ls-files -z -- '*.js' | xargs -0 -r -n1 node --check
+
+  build:
+    name: Construire (${{ matrix.os }})
+    needs: syntax
+    if: github.ref_type == 'tag'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - windows-latest
+          - macos-latest
+          - ubuntu-latest
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Installer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Installer les dépendances
+        run: npm install --no-audit --no-fund
+
+      - name: Construire l’application
+        run: npm run dist
+
+      - name: Archiver les installateurs
+        uses: actions/upload-artifact@v4
+        with:
+          name: installateur-${{ matrix.os }}
+          path: dist/*
+          if-no-files-found: error
+
+  release:
+    name: Publier la release GitHub
+    needs: build
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Télécharger les installateurs
+        uses: actions/download-artifact@v4
+        with:
+          pattern: installateur-*
+          path: release-assets
+          merge-multiple: true
+
+      - name: Créer la release et joindre les installateurs
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            release-assets/*.exe
+            release-assets/*.dmg
+            release-assets/*.AppImage
